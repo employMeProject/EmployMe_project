@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/register.css') }}">
+    <title>Step 4: Job Title & Login</title>
+</head>
+<body>
+    {% include "_header.html" %}
+
+    <div class="top-bar">
+        <a href="{{ url_for('register_step_3') }}"><span class="back-arrow">&#8592;</span></a>
+        <div class="progress-bar">
+            <div class="progress-filled" style="width: 85%;"></div>
+        </div>
+        <span class="save-exit">Save And Exit</span>
+    </div>
+
+    <div class="form-wrapper">
+        <h2>Set Your Desired Job Title and Account</h2>
+        <p class="subtitle">Let us know what kind of position you’re looking for, and create a login.</p>
+
+        <form method="POST" class="form-grid" style="justify-content: center;">
+            <div class="form-group">
+                <label for="job_title">Desired Job Title</label>
+                <input type="text" id="job_title" name="job_title" placeholder="e.g. Graphic Designer" required>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Create Username</label>
+                <input type="text" id="username" name="username" placeholder="Choose a username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Create Password</label>
+                <input type="password" id="password" name="password" placeholder="Choose a password" required>
+            </div>
+
+            <button type="submit" class="continue-btn">Continue</button>
+        </form>
+
+        <img src="/static/images/step_1_people.png" alt="" class="img_1_people">
+    </div>
+</body>
+</html>

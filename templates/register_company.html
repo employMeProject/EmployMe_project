@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+
+        form {
+            background: #172a45;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.4);
+            max-width: 600px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeIn 0.8s ease;
+            transition: all 0.3s ease;
+            margin: 0 auto;
+            margin-top: 15px;
+        }
+
+        form:hover {
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        input, textarea, button {
+            font-size: 16px;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        input, textarea {
+            background: #1f3555;
+            color: #fff;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            background: #28486e;
+            box-shadow: 0 0 0 2px #4fc3f7;
+        }
+
+        button {
+            background: #1e88e5;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background: #1565c0;
+            transform: scale(1.03);
+        }
+
+        ::placeholder {
+            color: #a0a0a0;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+
+</style>
+<body>
+    {% include "_header.html" %}
+    <form method="POST" enctype="multipart/form-data">
+        <input type="text" name="name" placeholder="Company Name" required>
+        <input type="text" name="website" placeholder="Website (optional)">
+        <textarea name="about" placeholder="About Company" required></textarea>
+        <input type="file" name="photo" required>
+        <input type="number" name="size" placeholder="Company Size (optional)">
+        <input type="text" name="contact_info" placeholder="Contact Info" required>
+        <input type="file" name="document" required>
+        <button type="submit">Register Company</button>
+    </form>
+    
+</body>
+</html>

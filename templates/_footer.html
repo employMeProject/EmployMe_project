@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css">
+    <title>Document</title>
+</head>
+<body>
+<style>
+    :root {
+        --primary-color: #4a6bff;
+        --text-color: #333;
+        --light-text: #666;
+        --border-color: #e0e0e0;
+        --hover-color: #3a56d4;
+    }
+    
+    .footer {
+        padding: 60px 5% 40px;
+        background-color: #f9f9f9;
+        font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        color: var(--text-color);
+    }
+
+    .footer-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .footer-top {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 40px;
+        padding-bottom: 40px;
+    }
+
+    .footer-language {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .footer-language h4 {
+        font-size: 14px;
+        color: var(--light-text);
+        margin-bottom: 12px;
+        font-weight: 600;
+    }
+
+    .footer-language select {
+        padding: 12px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        width: 100%;
+        max-width: 280px;
+        background-color: white;
+        font-size: 14px;
+        color: var(--text-color);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .footer-language select:hover {
+        border-color: var(--primary-color);
+    }
+
+    .footer-links {
+        display: flex;
+        gap: 80px;
+        flex-wrap: wrap;
+        flex: 2;
+    }
+
+    .footer-links div h4 {
+        font-weight: 600;
+        margin-bottom: 20px;
+        font-size: 16px;
+        color: var(--text-color);
+    }
+
+    .footer-links ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .footer-links li {
+        margin-bottom: 12px;
+    }
+
+    .footer-links a {
+        text-decoration: none;
+        color: var(--light-text);
+        font-size: 14px;
+        transition: color 0.2s ease;
+    }
+
+    .footer-links a:hover {
+        color: var(--primary-color);
+    }
+
+    .footer-divider {
+        height: 1px;
+        background-color: var(--border-color);
+        margin: 30px 0;
+        opacity: 0.5;
+    }
+
+    .footer-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .footer-social {
+        display: flex;
+        gap: 20px;
+    }
+
+    .footer-social a {
+        color: var(--light-text);
+        font-size: 18px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .footer-social a:hover {
+        color: white;
+        background-color: var(--primary-color);
+        transform: translateY(-2px);
+    }
+
+    .footer-copyright {
+        font-size: 14px;
+        color: var(--light-text);
+    }
+
+    @media (max-width: 768px) {
+        .footer-top {
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .footer-links {
+            gap: 40px;
+        }
+        
+        .footer-bottom {
+            flex-direction: column-reverse;
+        }
+    }
+</style>
+
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-top">
+            <div class="footer-language">
+                <h4>Language</h4>
+                <select>
+                    <option selected>United States (English)</option>
+                    <option>United Kingdom (English)</option>
+                    <option>España (Español)</option>
+                    <option>Deutschland (Deutsch)</option>
+                    <option>France (Français)</option>
+                </select>
+            </div>
+
+            <div class="footer-links">
+                <div>
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Career</a></li>
+                        <li><a href="#">News</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Accessibility</a></li>
+                        <li><a href="#">Partners</a></li>
+                        <li><a href="#">Employers</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms Of Use</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>About Us</h4>
+                    <ul>
+                        <li><a href="#">About EmployMe</a></li>
+                        <li><a href="#">Work for EmployMe</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-divider"></div>
+
+        <div class="footer-bottom">
+            <div class="footer-copyright">
+                © 2023 EmployMe. All rights reserved.
+            </div>
+            <div class="footer-social">
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

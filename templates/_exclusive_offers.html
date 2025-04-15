@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="exclusive-offers-section">
+        <h1>Exclusive Offers</h1>
+        
+        <div class="offers-container">
+            {% for job in exclusive_offers %}
+            <div class="job-card">
+                <div class="job-title">{{ job.title }}</div>
+                <div class="job-price">{{ job.price }}</div>
+                
+                {% if job.companies %}
+                    {% for company in job.companies %}
+                        <div class="job-company">{{ company }}</div>
+                    {% endfor %}
+                {% endif %}
+                
+                <div class="job-details">
+                    {% if job.early_apply %}<span class="early-apply">(early Apply)</span>{% endif %}
+                    {% if job.multiple_candidates %}Multiple Candidate {{ job.duration }}{% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <style>
+        .exclusive-offers-section {
+            margin: 20px 0;
+        }
+        .offers-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .job-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            width: 300px;
+        }
+        .job-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .job-price {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        .job-company {
+            margin-bottom: 5px;
+        }
+        .job-details {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+        }
+        .early-apply {
+            color: orange;
+            font-weight: bold;
+        }
+    </style>
+</body>
+</html>

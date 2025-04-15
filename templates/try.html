@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmployMe - Главная</title>
+    <style>
+        /* Стили для поисковика */
+        .job-search {
+            background: #f8f9fa;
+            padding: 40px 0;
+            text-align: center;
+        }
+        
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .search-title {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .search-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .search-input {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .search-button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        
+        .search-button:hover {
+            background: #2980b9;
+        }
+        
+        .employer-link {
+            display: block;
+            margin-top: 15px;
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        /* Адаптивность */
+        @media (min-width: 768px) {
+            .search-form {
+                flex-direction: row;
+            }
+            
+            .search-input {
+                flex: 1;
+            }
+            
+            .search-button {
+                width: auto;
+                padding: 12px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% extends 'base.html' %}
+
+    {% block content %}
+    <section class="job-search">
+        <div class="search-container">
+            <h1 class="search-title">Start Your Job Journey</h1>
+            
+            <form class="search-form" action="/search" method="GET">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    name="query" 
+                    placeholder="Search by job title"
+                    aria-label="Job title search"
+                >
+                
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    name="location" 
+                    placeholder="Location"
+                    aria-label="Location search"
+                >
+                
+                <button type="submit" class="search-button">Search</button>
+            </form>
+            
+            <a href="/employers" class="employer-link">Employers? Post your job here</a>
+        </div>
+    </section>
+
+    <!-- Здесь можно добавить другие секции, например Exclusive Offers -->
+    {% include '_exclusive_offers.html' %}
+    
+    {% endblock %}
+</body>
+</html>

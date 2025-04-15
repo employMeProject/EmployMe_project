@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 2: Location</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/register.css') }}">
+</head>
+<body>
+    {% include "_header.html" %}
+    <div class="form-wrapper">
+        <div class="top-bar">
+            <a href="{{ url_for('register_step_1') }}"><span class="back-arrow">&#8592;</span></a>
+            <div class="progress-bar">
+                <div class="progress-filled" style="width: 45%;"></div>
+            </div>
+            <span class="save-exit">Save And Exit</span>
+        </div>
+
+        <h2>We will make sure your preferences<br>are up to date.</h2>
+        <p class="subtitle">What is your location?<br>We use this to match you with nearby offers.</p>
+
+        <form method="POST" class="form-grid">
+            <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" placeholder="Write your city" required>
+            </div>
+            <button type="submit" class="continue-btn">Continue</button>
+        </form>
+        
+        <img src="/static/images/step_1_people.png" alt="" class="img_1_people">
+    </div>
+</body>
+</html>

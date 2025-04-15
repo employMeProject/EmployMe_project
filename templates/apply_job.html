@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    .apply-container {
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 30px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+
+    .job-header {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .apply-form {
+        margin-top: 30px;
+    }
+
+    .resume-selector {
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .submit-application {
+        background-color: #4e73df;
+        color: white;
+        padding: 10px 25px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .submit-application:hover {
+        background-color: #3a5ec0;
+    }
+
+    .no-resume {
+        text-align: center;
+        padding: 30px;
+        background: #f8f9fa;
+        border-radius: 5px;
+    }
+    @media (max-width: 768px) {
+        .apply-container {
+            margin: 20px;
+            padding: 20px;
+        }
+        
+        .job-header h1 {
+            font-size: 24px;
+        }
+    }
+    </style>
+<body>
+    {% extends "base.html" %}
+
+    {% block content %}
+    <div class="apply-container">
+        <div class="job-header">
+            <h1>Apply for: {{ job.job_title }}</h1>
+            <p>at {{ job.company.name if job.company else "Company" }}</p>
+        </div>
+
+        <div class="apply-form">
+            <h3>Your Resume</h3>
+            
+            {% if current_user.resumes %}
+            <form method="POST" action="{{ url_for('apply_for_job', job_id=job.id) }}">
+                <div class="resume-selector">
+                    <label>Select Resume:</label>
+                    <select name="resume_id" class="form-control">
+                        {% for resume in current_user.resumes %}
+                        <option value="{{ resume.id }}">
+                            {{ resume.name }} - {{ resume.last_name }} ({{ resume.email }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Cover Letter (optional):</label>
+                    <textarea name="message" class="form-control" rows="5"></textarea>
+                </div>
+
+                <button type="submit" class="submit-application">Submit Application</button>
+            </form>
+            {% else %}
+            <div class="no-resume">
+                <p>You don't have any resumes uploaded yet.</p>
+                <a href="{{ url_for('profile') }}" class="btn btn-primary">Upload Resume</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endblock %}
+</body>
+</html>

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    /* Company Profile Styles */
+    .company-profile-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    .company-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 40px;
+        padding-bottom: 30px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .company-logo {
+        width: 120px;
+        height: 120px;
+        border-radius: 10px;
+        object-fit: cover;
+        margin-right: 30px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .company-logo-placeholder {
+        width: 120px;
+        height: 120px;
+        border-radius: 10px;
+        background-color: #4e73df;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        font-weight: bold;
+        margin-right: 30px;
+    }
+
+    .company-info h1 {
+        margin: 0 0 10px;
+        color: #2c3e50;
+    }
+
+    .company-actions {
+        margin-top: 20px;
+        display: flex;
+        gap: 15px;
+    }
+
+    .company-details {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 30px;
+        margin-bottom: 40px;
+    }
+
+    .about-section {
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .company-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 15px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .stat-card h4 {
+        margin: 0 0 10px;
+        font-size: 14px;
+        color: #7f8c8d;
+    }
+
+    .stat-card p {
+        margin: 0;
+        font-size: 24px;
+        font-weight: bold;
+        color: #4e73df;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .job-list {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .job-card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .job-main-info h3 {
+        margin: 0 0 5px;
+        font-size: 18px;
+    }
+
+    .salary {
+        color: #27ae60;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+
+    .job-stats {
+        text-align: center;
+    }
+
+    .applications-count {
+        background: #f8f9fa;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 14px;
+    }
+
+    .job-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+
+    .applications-list {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .application-card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .application-info h4 {
+        margin: 0 0 5px;
+    }
+
+    .application-date {
+        color: #7f8c8d;
+        font-size: 14px;
+        margin: 5px 0;
+    }
+
+    .application-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+
+    .no-jobs, .no-applications {
+        background: #f8f9fa;
+        padding: 40px;
+        text-align: center;
+        border-radius: 10px;
+        margin-bottom: 40px;
+    }
+
+    .no-jobs p, .no-applications p {
+        margin-bottom: 20px;
+        color: #7f8c8d;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .company-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .company-logo, .company-logo-placeholder {
+            margin-right: 0;
+            margin-bottom: 20px;
+        }
+        
+        .company-actions {
+            justify-content: center;
+        }
+        
+        .company-details {
+            grid-template-columns: 1fr;
+        }
+        
+        .job-card, .application-card {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .job-actions, .application-actions {
+            justify-content: flex-start;
+        }
+    }
+</style>
+<body>
+    {% extends "base.html" %}
+
+    {% block title %}Company Profile - EmployMe{% endblock %}
+
+    {% block content %}
+    <div class="company-profile-container">
+        <!-- Шапка профиля компании -->
+        <div class="company-header">
+            {% if company.photo %}
+            <img src="{{ url_for('static', filename='uploads/' + company.photo) }}" 
+                alt="{{ company.name }}" class="company-logo">
+            {% else %}
+            <div class="company-logo-placeholder">
+                {{ company.name[0]|upper }}
+            </div>
+            {% endif %}
+            
+            <div class="company-info">
+                <h1>{{ company.name }}</h1>
+                {% if company.website %}
+                <p><a href="{{ company.website }}" target="_blank">{{ company.website }}</a></p>
+                {% endif %}
+                
+                <div class="company-actions">
+                    <a href="{{ url_for('create_job_offer') }}" class="btn btn-primary">Create New Job Offer</a>
+                    <a href="{{ url_for('edit_company') }}" class="btn btn-outline-secondary">Edit Profile</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Основная информация о компании -->
+        <div class="company-details">
+            <div class="about-section">
+                <h3>About Company</h3>
+                <p>{{ company.about or 'No description provided' }}</p>
+            </div>
+            
+            <div class="company-stats">
+                <div class="stat-card">
+                    <h4>Active Jobs</h4>
+                    <p>{{ company.job_offers|length }}</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Applications</h4>
+                    <p>{{ applications_count }}</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Since</h4>
+                    <p>2023</p> <!-- Можно добавить дату создания в модель Company -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Секция с вакансиями компании -->
+        <div class="company-jobs">
+            <div class="section-header">
+                <h2>Your Job Offers</h2>
+                <a href="{{ url_for('create_job_offer') }}" class="btn btn-sm btn-outline-primary">+ Add New</a>
+            </div>
+            
+            {% if company.job_offers %}
+            <div class="job-list">
+                {% for job in company.job_offers %}
+                <div class="job-card">
+                    <div class="job-main-info">
+                        <h3>{{ job.job_title }}</h3>
+                        <p>{{ job.location }} • {{ job.job_type }}</p>
+                        <p class="salary">{{ job.salary_range }}</p>
+                    </div>
+                    
+                    <div class="job-stats">
+                        <span class="applications-count">
+                            {{ job.applications|length }} applications
+                        </span>
+                    </div>
+                    
+                    <div class="job-actions">
+                        <a href="{{ url_for('job_applications', job_id=job.id) }}" 
+                        class="btn btn-sm btn-outline-secondary">View Applications</a>
+                        <a href="{{ url_for('edit_job_offer', job_id=job.id) }}" 
+                        class="btn btn-sm btn-outline-primary">Edit</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-jobs">
+                <p>You haven't posted any job offers yet.</p>
+                <a href="{{ url_for('create_job_offer') }}" class="btn btn-primary">Create Your First Job Offer</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Секция с последними заявками -->
+        <div class="recent-applications">
+            <h2>Recent Applications</h2>
+            
+            {% if recent_applications %}
+            <div class="applications-list">
+                {% for app in recent_applications %}
+                <div class="application-card">
+                    <div class="application-info">
+                        <h4>{{ app.user.first_name }} {{ app.user.last_name }}</h4>
+                        <p>Applied for: {{ app.job_offer.job_title }}</p>
+                        <p class="application-date">{{ app.created_at.strftime('%d %b %Y') }}</p>
+                        <span class="badge bg-{{ 'success' if app.status == 'accepted' else 'warning' if app.status == 'under_review' else 'danger' }}">
+                            {{ app.status }}
+                        </span>
+                    </div>
+                    
+                    <div class="application-actions">
+                        <a href="{{ url_for('view_application', app_id=app.id) }}" 
+                        class="btn btn-sm btn-outline-primary">View</a>
+                        <a href="{{ url_for('download_resume', resume_id=app.resume.id) }}" 
+                        class="btn btn-sm btn-outline-secondary">Download Resume</a>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                {% if applications_count > 5 %}
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('company_applications') }}" class="btn btn-primary">
+                        View All Applications ({{ applications_count }})
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="no-applications">
+                <p>No applications yet. When candidates apply to your jobs, they'll appear here.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endblock %}
+</body>
+</html>

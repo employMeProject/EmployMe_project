@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - EmployMe</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+    <style>
+        /* Добавленные стили для Swiper */
+        .swiper {
+            width: 100%;
+            padding: 30px 0 50px;
+        }
+        
+        .swiper-slide {
+            width: auto;
+            padding: 0 15px;
+        }
+        
+        .job-slide-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 10px;
+        }
+        
+        .swiper-button-next,
+        .swiper-button-prev {
+            color: #4e73df;
+            background: rgba(255,255,255,0.8);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .swiper-button-next::after,
+        .swiper-button-prev::after {
+            font-size: 20px;
+        }
+        
+        /* Стили для карточек вакансий */
+        .job-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .job-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+        
+        .job-card h3 {
+            margin: 0 0 10px;
+            color: #2c3e50;
+            font-size: 1.2rem;
+        }
+        
+        .job-card p {
+            margin: 5px 0;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .apply-button {
+            display: inline-block;
+            margin-top: auto;
+            padding: 8px 20px;
+            background-color: #4e73df;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            align-self: flex-start;
+            margin-top: 15px;
+        }
+        
+        .apply-button:hover {
+            background-color: #3a5ec0;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+  
+    {% extends 'base.html' %}
+
+    {% block title %}Home - EmployMe{% endblock %}
+
+    {% block content %}
+    <h1 style="text-align: center; margin-top: 100px;">Start your job journey</h1>
+    <form class="search-form" action="{{ url_for('search_jobs_route') }}" method="GET">
+        <div class="search-row">
+            <input 
+                type="text" 
+                class="search-input" 
+                name="query"  
+                placeholder="Search"
+                aria-label="Job search"
+                value="{{ request.args.get('query', '') }}"
+            >
+            <input 
+                type="text" 
+                class="search-input" 
+                name="location" 
+                placeholder="Location"
+                aria-label="Location"
+                value="{{ request.args.get('location', '') }}"
+            >
+        </div>
+        
+        <button type="submit" class="search-button">Search</button>
+    </form>
+    <form method="GET" action="{{ url_for('search_jobs_route') }}" id="filterForm" class="filterFormOval">
+      <div class="filter-tags">
+        {% for t in ['Полная занятость','Частичная занятость','Пока нет Данных','Пока нет Данных','Пока нет Данных','Пока нет Данных','Пока нет Данных','Пока нет Данных','Пока нет Данных','Пока нет Данных'] %}
+          <button type="submit" name="job_type" value="{{ t }}" 
+                  class="filter-button {% if request.args.get('job_type') == t %}active{% endif %}">
+            {{ t }}
+          </button>
+        {% endfor %}
+      </div>
+    </form>    
+    <!-- Exclusive Offers Block: отображается, если нет поиска -->
+      {% if not search_active %}
+      <section class="exclusive-offers">
+          <h1>Exclusive Offers</h1>
+          
+          <div class="job-cards-container">
+              {% for job in jobs %}
+              <div class="job-card">
+                  <h3 class="job-title">{{ job.job_title }}</h3>
+                  <p class="job-price">{{ job.salary_range }}</p>
+                  <p class="job-company">{{ job.company_name }}</p>
+                  
+                  <div class="job-details">
+                      {% if job.early_apply %}
+                          <span class="early-apply">(Early Apply)</span>
+                      {% endif %}
+                      {% if job.multiple_candidates %}
+                          <span class="multiple-candidates">Multiple Candidates</span>
+                      {% endif %}
+                  </div>
+                  <a href="{{ url_for('apply_for_job', job_id=job.id) }}" class="apply-button">Apply Now</a>
+              </div>
+              {% endfor %}
+          </div>
+      </section>
+      {% endif %}
+
+      <!-- Search Results Block: отображается, если выполнен поиск -->
+      {% if search_active %}
+      {% if jobs|length > 0 %}
+      <div class="swiper">
+        <div class="swiper-wrapper">
+          {% for job in jobs %}
+            <div class="swiper-slide">
+              <div class="job-card">
+                <h3>{{ job.job_title }}</h3>
+                <p><i class="bi bi-geo-alt"></i> {{ job.location }}</p>
+                <p><i class="bi bi-briefcase"></i> {{ job.job_type }}</p>
+                {% if job.get('salary_range') %}
+                    <p><i class="bi bi-cash"></i> {{ job.salary_range }}</p>
+                {% endif %}
+                <a href="{{ url_for('apply_for_job', job_id=job.id) }}" class="apply-button">Apply Now</a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        
+        <!-- Навигация -->
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+      </div>
+      {% else %}
+        <div class="no-results">
+            <p>No jobs found matching your criteria.</p>
+        </div>
+      {% endif %}
+      {% endif %}
+      
+    <section class="why-choose">
+        <div class="overlay">
+          <div class="content-box">
+            <div class="why-row">
+              <div class="why-text">
+                <h2>So Why You Should Choose EmployMe ?</h2>
+              </div>
+              <div class="reasons">
+                <div class="reason">
+                    <img src="{{ url_for('static', filename='images/why1.png') }}" alt="Community">
+                  <p>EmployMe community</p>
+                </div>
+                <div class="reason">
+                    <img src="{{ url_for('static', filename='images/why2.png') }}" alt="Opportunities">
+                  <p>Find job opportunities</p>
+                </div>
+                <div class="reason">
+                    <img src="{{ url_for('static', filename='images/why3.png') }}" alt="Clients">
+                  <p>Find perfect clients</p>
+                </div>
+                <div class="reason">
+                    <img src="{{ url_for('static', filename='images/why4.png') }}" alt="Income">
+                  <p>Fast income</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section class="partners-section">
+        <h2>Our Partners</h2>
+        <div class="partners-grid">
+          <div class="partner-card">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google" width="120">
+          </div>
+          <div class="partner-card">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft" width="120">
+          </div>
+          <div class="partner-card">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/96/Apple_logo_black.svg" alt="Apple" width="120">
+          </div>
+          <div class="partner-card">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon" width="120">
+          </div>
+          <div class="partner-card">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/01/LinkedIn_Logo.svg" alt="LinkedIn" width="120">
+          </div>
+          <div class="partner-card">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Laravel.svg" alt="Laravel" width="120">
+          </div>
+        </div>
+      </section>
+    {% include "_footer.html" %}
+
+    {% endblock %}
+    
+    <!-- Подключаем скрипты в конце body -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Инициализация Swiper
+            const swiper = new Swiper('.swiper', {
+                slidesPerView: 'auto',
+                spaceBetween: 20,
+                centeredSlides: false,
+                loop: false,
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                breakpoints: {
+                    640: {
+                        slidesPerView: 1,
+                        spaceBetween: 20,
+                    },
+                    768: {
+                        slidesPerView: 2,
+                        spaceBetween: 30,
+                    },
+                    1024: {
+                        slidesPerView: 3,
+                        spaceBetween: 40,
+                    },
+                }
+            });
+            
+            // Добавляем обработчики для всех кнопок Apply
+            document.querySelectorAll('.apply-button').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    if (!{{ 'true' if current_user.is_authenticated else 'false' }}) {
+                        e.preventDefault();
+                        window.location.href = "{{ url_for('login') }}";
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

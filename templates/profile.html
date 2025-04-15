@@ -1,0 +1,936 @@
+    <!DOCTYPE html>
+    <html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Мой профиль</title>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <style>
+            :root {
+                --primary-color: #4361ee;
+                --secondary-color: #3f37c9;
+                --accent-color: #4895ef;
+                --light-color: #f8f9fa;
+                --dark-color: #212529;
+                --success-color: #4cc9f0;
+                --danger-color: #f72585;
+            }
+            
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Montserrat', sans-serif;
+            }
+            
+            body {
+                background-color: #f5f7fa;
+                color: var(--dark-color);
+                line-height: 1.6;
+            }
+            
+            .profile-container {
+                max-width: 1200px;
+                margin: 2rem auto;
+                padding: 0 1rem;
+            }
+            
+            .profile-header {
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                color: white;
+                padding: 2rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                margin-bottom: 2rem;
+                display: flex;
+                align-items: center;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .profile-header::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                right: -50%;
+                width: 100%;
+                height: 200%;
+                background: rgba(255, 255, 255, 0.1);
+                transform: rotate(30deg);
+            }
+            
+            .avatar-container {
+                position: relative;
+                margin-right: 2rem;
+                z-index: 1;
+            }
+            
+            .avatar {
+                width: 120px;
+                height: 120px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 4px solid white;
+            }
+            
+            .avatar-upload {
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                background: var(--accent-color);
+                color: white;
+                width: 35px;
+                height: 35px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+            }
+            
+            .avatar-upload input {
+                display: none;
+            }
+            
+            .profile-info h1 {
+                font-size: 2rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .profile-info p {
+                opacity: 0.9;
+                margin-bottom: 0.3rem;
+            }
+            
+            .badge {
+                display: inline-block;
+                background-color: var(--accent-color);
+                color: white;
+                padding: 0.3rem 0.8rem;
+                border-radius: 20px;
+                font-size: 0.8rem;
+                margin-top: 0.5rem;
+            }
+            
+            .profile-content {
+                display: grid;
+                grid-template-columns: 1fr 2fr;
+                gap: 2rem;
+            }
+            
+            .profile-sidebar, .profile-main {
+                background: white;
+                border-radius: 10px;
+                padding: 1.5rem;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+            
+            .section-title {
+                font-size: 1.3rem;
+                margin-bottom: 1rem;
+                color: var(--primary-color);
+                border-bottom: 2px solid var(--accent-color);
+                padding-bottom: 0.5rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .edit-section-btn {
+                background: none;
+                border: none;
+                color: var(--accent-color);
+                cursor: pointer;
+                font-size: 0.9rem;
+                display: flex;
+                align-items: center;
+            }
+            
+            .edit-section-btn i {
+                margin-right: 5px;
+            }
+            
+            .info-item {
+                margin-bottom: 1rem;
+                position: relative;
+            }
+            
+            .info-label {
+                font-weight: 600;
+                color: var(--secondary-color);
+                display: block;
+                margin-bottom: 0.2rem;
+            }
+            
+            .info-value {
+                padding: 0.5rem;
+                border-radius: 5px;
+            }
+            
+            .editable {
+                cursor: pointer;
+                transition: background-color 0.2s;
+            }
+            
+            .editable:hover {
+                background-color: rgba(67, 97, 238, 0.1);
+            }
+            
+            .edit-form {
+                display: none;
+                margin-top: 1rem;
+                padding: 1rem;
+                background: #f8f9fa;
+                border-radius: 5px;
+            }
+            
+            .form-group {
+                margin-bottom: 1rem;
+            }
+            
+            .form-group label {
+                display: block;
+                margin-bottom: 0.5rem;
+                font-weight: 600;
+                color: var(--secondary-color);
+            }
+            
+            .form-control {
+                width: 100%;
+                padding: 0.5rem;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                font-size: 1rem;
+            }
+            
+            textarea.form-control {
+                min-height: 100px;
+                resize: vertical;
+            }
+            
+            .btn {
+                padding: 0.5rem 1rem;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight: 600;
+                transition: all 0.3s;
+            }
+            
+            .btn-primary {
+                background-color: var(--primary-color);
+                color: white;
+            }
+            
+            .btn-primary:hover {
+                background-color: var(--secondary-color);
+            }
+            
+            .btn-danger {
+                background-color: var(--danger-color);
+                color: white;
+            }
+            
+            .btn-danger:hover {
+                background-color: #d3165e;
+            }
+            
+            .btn-sm {
+                padding: 0.3rem 0.7rem;
+                font-size: 0.9rem;
+            }
+            
+            .skills {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin-top: 1rem;
+            }
+            
+            .skill {
+                background-color: var(--light-color);
+                padding: 0.3rem 0.8rem;
+                border-radius: 20px;
+                font-size: 0.9rem;
+                display: flex;
+                align-items: center;
+            }
+            
+            .skill-remove {
+                margin-left: 5px;
+                cursor: pointer;
+                color: #999;
+            }
+            
+            .skill-remove:hover {
+                color: var(--danger-color);
+            }
+            
+            .edit-btn {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                background-color: white;
+                color: var(--primary-color);
+                border: none;
+                padding: 0.5rem 1rem;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight: 600;
+                transition: all 0.3s;
+                z-index: 1;
+            }
+            
+            .edit-btn:hover {
+                background-color: var(--accent-color);
+                color: white;
+            }
+            
+            .resume-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1rem;
+                border: 1px solid #eee;
+                border-radius: 8px;
+                margin-bottom: 1rem;
+            }
+            
+            .resume-actions a {
+                margin-left: 0.5rem;
+                color: var(--primary-color);
+                text-decoration: none;
+            }
+            
+            .resume-actions a:hover {
+                text-decoration: underline;
+            }
+            
+            .upload-resume-btn {
+                display: block;
+                width: 100%;
+                padding: 1rem;
+                text-align: center;
+                background: #f8f9fa;
+                border: 2px dashed #ddd;
+                border-radius: 8px;
+                cursor: pointer;
+                margin-top: 1rem;
+            }
+            
+            .upload-resume-btn:hover {
+                border-color: var(--accent-color);
+            }
+            
+            .applications-section {
+                margin-top: 2rem;
+                background: white;
+                padding: 1.5rem;
+                border-radius: 10px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+
+            .application-tabs {
+                display: flex;
+                border-bottom: 1px solid #eee;
+                margin-bottom: 1rem;
+            }
+
+            .tab-btn {
+                padding: 0.5rem 1rem;
+                background: none;
+                border: none;
+                cursor: pointer;
+                font-weight: 600;
+                color: #666;
+                position: relative;
+            }
+
+            .tab-btn.active {
+                color: var(--primary-color);
+            }
+
+            .tab-btn.active::after {
+                content: '';
+                position: absolute;
+                bottom: -1px;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: var(--primary-color);
+            }
+
+            .application-card {
+                padding: 1rem;
+                border: 1px solid #eee;
+                border-radius: 8px;
+                margin-bottom: 1rem;
+                position: relative;
+            }
+
+            .application-card h3 {
+                margin-bottom: 0.3rem;
+            }
+
+            .company {
+                color: #666;
+                margin-bottom: 0.5rem;
+            }
+
+            .date {
+                font-size: 0.9rem;
+                color: #888;
+            }
+
+            .status-badge {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                padding: 0.3rem 0.8rem;
+                border-radius: 20px;
+                font-size: 0.8rem;
+            }
+
+            .status-badge.under_review {
+                background: #fff3cd;
+                color: #856404;
+            }
+
+            .status-badge.accepted {
+                background: #d4edda;
+                color: #155724;
+            }
+
+            .status-badge.rejected {
+                background: #f8d7da;
+                color: #721c24;
+            }
+            
+            @media (max-width: 768px) {
+                .profile-content {
+                    grid-template-columns: 1fr;
+                }
+                
+                .profile-header {
+                    flex-direction: column;
+                    text-align: center;
+                }
+                
+                .avatar-container {
+                    margin-right: 0;
+                    margin-bottom: 1rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        
+        <div class="profile-container">
+            <div class="profile-header">
+                <div class="avatar-container">
+                    <img src="{{ url_for('static', filename='uploads/' + current_user.avatar) if current_user.avatar else url_for('static', filename='default-avatar.jpg') }}" 
+                        alt="Аватар" class="avatar" id="user-avatar">
+                    <label class="avatar-upload" title="Изменить аватар">
+                        <i class="fas fa-camera"></i>
+                        <input type="file" id="avatar-upload" accept="image/*">
+                    </label>
+                </div>
+                <div class="profile-info">
+                    <h1 id="user-name">{{ current_user.first_name }} {{ current_user.last_name }}</h1>
+                    <p id="user-title">{{ current_user.desired_offer_title or "Не указано" }}</p>
+                    <p id="user-city">{{ current_user.city or "Город не указан" }}</p>
+                    <span class="badge">Активный пользователь</span>
+                </div>
+                <button class="edit-btn" id="edit-profile-btn"><i class="fas fa-edit"></i> Редактировать</button>
+            </div>
+            
+            <div class="profile-content">
+                <div class="profile-sidebar">
+                    <h2 class="section-title">
+                        Контактная информация
+                        <button class="edit-section-btn" data-section="contact">
+                            <i class="fas fa-edit"></i> Изменить
+                        </button>
+                    </h2>
+                    
+                    <div class="info-item">
+                        <span class="info-label">Email</span>
+                        <div class="info-value editable" data-field="email">{{ current_user.email or "Не указан" }}</div>
+                        
+                        <div class="edit-form" id="email-edit-form">
+                            <div class="form-group">
+                                <label for="email-input">Email</label>
+                                <input type="email" id="email-input" class="form-control" value="{{ current_user.email or '' }}">
+                            </div>
+                            <button class="btn btn-primary btn-sm" onclick="saveField('email')">Сохранить</button>
+                            <button class="btn btn-danger btn-sm" onclick="cancelEdit('email')">Отмена</button>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">Телефон</span>
+                        <div class="info-value editable" data-field="phone">
+                            {% if current_user.phone_code and current_user.phone_number %}
+                                +{{ current_user.phone_code }} {{ current_user.phone_number }}
+                            {% else %}
+                                Не указан
+                            {% endif %}
+                        </div>
+                        
+                        <div class="edit-form" id="phone-edit-form">
+                            <div class="form-group">
+                                <label for="phone-code-input">Код страны</label>
+                                <input type="text" id="phone-code-input" class="form-control" 
+                                    value="{{ current_user.phone_code or '' }}" placeholder="7">
+                            </div>
+                            <div class="form-group">
+                                <label for="phone-number-input">Номер телефона</label>
+                                <input type="tel" id="phone-number-input" class="form-control" 
+                                    value="{{ current_user.phone_number or '' }}" placeholder="XXX-XXX-XXXX">
+                            </div>
+                            <button class="btn btn-primary btn-sm" onclick="savePhone()">Сохранить</button>
+                            <button class="btn btn-danger btn-sm" onclick="cancelEdit('phone')">Отмена</button>
+                        </div>
+                    </div>
+                    
+                    <h2 class="section-title">
+                        Навыки
+                        <button class="edit-section-btn" data-section="skills">
+                            <i class="fas fa-edit"></i> Изменить
+                        </button>
+                    </h2>
+                    
+                    <div class="skills" id="skills-list">
+                        {% for skill in (current_user.skills or '').split(',') if skill %}
+                        <span class="skill">{{ skill }} <span class="skill-remove" onclick="removeSkill('{{ skill }}')">&times;</span></span>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="edit-form" id="skills-edit-form" style="display: none;">
+                        <div class="form-group">
+                            <label for="new-skill-input">Добавить навык</label>
+                            <div class="input-group">
+                                <input type="text" id="new-skill-input" class="form-control" placeholder="Новый навык">
+                                <button class="btn btn-primary" onclick="addSkill()">Добавить</button>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveSkills()">Сохранить</button>
+                        <button class="btn btn-danger" onclick="cancelEdit('skills')">Отмена</button>
+                    </div>
+                    
+                    <h2 class="section-title">Резюме</h2>
+                    
+                    {% if current_user.resumes %}
+                    {% for resume in current_user.resumes %}
+                    <div class="resume-item">
+                        <div>
+                            <h4>{{ resume.name or "Резюме" }}</h4>
+                            <small>Загружено: {{ resume.created_at.strftime('%d.%m.%Y') if resume.created_at else "Дата неизвестна" }}</small>
+                        </div>
+                        <div class="resume-actions">
+                            <a href="{{ url_for('static', filename='uploads/' + resume.resume_path) }}" download>
+                                <i class="fas fa-download"></i> Скачать
+                            </a>
+                            <a href="#" onclick="deleteResume({{ resume.id }})">
+                                <i class="fas fa-trash"></i> Удалить
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p>У вас пока нет загруженных резюме</p>
+                    {% endif %}
+                    
+                    <label class="upload-resume-btn" for="resume-upload">
+                        <i class="fas fa-upload"></i> Загрузить новое резюме
+                    </label>
+                    <input type="file" id="resume-upload" accept=".pdf,.doc,.docx" style="display: none;">
+                </div>
+                
+                <div class="profile-main">
+                    <h2 class="section-title">
+                        О себе
+                        <button class="edit-section-btn" data-section="about">
+                            <i class="fas fa-edit"></i> Изменить
+                        </button>
+                    </h2>
+                    
+                    <div class="info-item">
+                        <div class="info-value editable" data-field="about" id="about-text">
+                            {{ current_user.about or "Расскажите о себе, своих навыках и опыте работы. Это поможет работодателям лучше узнать вас." }}
+                        </div>
+                        
+                        <div class="edit-form" id="about-edit-form">
+                            <div class="form-group">
+                                <textarea id="about-input" class="form-control" rows="5">{{ current_user.about or '' }}</textarea>
+                            </div>
+                            <button class="btn btn-primary" onclick="saveField('about')">Сохранить</button>
+                            <button class="btn btn-danger" onclick="cancelEdit('about')">Отмена</button>
+                        </div>
+                    </div>
+                    
+                    <h2 class="section-title">
+                        Зарплатные ожидания
+                        <button class="edit-section-btn" data-section="salary">
+                            <i class="fas fa-edit"></i> Изменить
+                        </button>
+                    </h2>
+                    
+                    <div class="info-item">
+                        <span class="info-label">Минимальная зарплата</span>
+                        <div class="info-value editable" data-field="min_salary">
+                            {% if current_user.min_salary %}
+                                {{ current_user.min_salary }} {{ current_user.currency or 'руб.' }}
+                            {% else %}
+                                Не указана
+                            {% endif %}
+                        </div>
+                        
+                        <div class="edit-form" id="salary-edit-form">
+                            <div class="form-group">
+                                <label for="min-salary-input">Минимальная зарплата</label>
+                                <input type="number" id="min-salary-input" class="form-control" 
+                                    value="{{ current_user.min_salary or '' }}" placeholder="Укажите сумму">
+                            </div>
+                            <div class="form-group">
+                                <label for="currency-select">Валюта</label>
+                                <select id="currency-select" class="form-control">
+                                    <option value="руб." {% if current_user.currency == 'руб.' %}selected{% endif %}>Рубли</option>
+                                    <option value="USD" {% if current_user.currency == 'USD' %}selected{% endif %}>Доллары</option>
+                                    <option value="EUR" {% if current_user.currency == 'EUR' %}selected{% endif %}>Евро</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary btn-sm" onclick="saveSalary()">Сохранить</button>
+                            <button class="btn btn-danger btn-sm" onclick="cancelEdit('salary')">Отмена</button>
+                        </div>
+                    </div>
+                    
+                    <div class="applications-section">
+                        <h2 class="section-title">Мои заявки</h2>
+                        
+                        <div class="application-tabs">
+                            <button class="tab-btn active" data-tab="under_review">В процессе</button>
+                            <button class="tab-btn" data-tab="accepted">Одобрено</button>
+                            <button class="tab-btn" data-tab="rejected">Отклонено</button>
+                        </div>
+                        
+                        <div class="applications-container">
+                            {% for status in ['under_review', 'accepted', 'rejected'] %}
+                            <div class="application-list" id="{{ status }}-list" 
+                                style="display: {{ 'block' if status == 'under_review' else 'none' }}">
+                                
+                                {% for app in current_user.applications if app.status == status %}
+                                <div class="application-card {{ app.status }}">
+                                    <h3>{{ app.job_offer.job_title }}</h3>
+                                    <p class="company">{{ app.job_offer.company.name }}</p>
+                                    <p class="date">Подано: {{ app.created_at.strftime('%d.%m.%Y') }}</p>
+                                    <div class="status-badge {{ app.status }}">
+                                        {{ 'В процессе' if app.status == 'under_review' 
+                                        else 'Одобрено' if app.status == 'accepted' 
+                                        else 'Отклонено' }}
+                                    </div>
+                                </div>
+                                {% else %}
+                                <p class="no-applications">Нет заявок</p>
+                                {% endfor %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно для редактирования профиля -->
+        <div class="modal" id="profile-edit-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+            <div style="background: white; padding: 2rem; border-radius: 10px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto;">
+                <h2 style="margin-bottom: 1.5rem;">Редактирование профиля</h2>
+                
+                <form id="profile-edit-form">
+                    <div class="form-group">
+                        <label for="first-name-input">Имя</label>
+                        <input type="text" id="first-name-input" class="form-control" value="{{ current_user.first_name }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="last-name-input">Фамилия</label>
+                        <input type="text" id="last-name-input" class="form-control" value="{{ current_user.last_name }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="title-input">Желаемая должность</label>
+                        <input type="text" id="title-input" class="form-control" value="{{ current_user.desired_offer_title or '' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="city-input">Город</label>
+                        <input type="text" id="city-input" class="form-control" value="{{ current_user.city or '' }}">
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button type="button" class="btn btn-primary" onclick="saveProfile()">Сохранить</button>
+                        <button type="button" class="btn btn-danger" onclick="document.getElementById('profile-edit-modal').style.display = 'none'">Отмена</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            // Обработчики для редактирования разделов
+            document.querySelectorAll('.edit-section-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const section = this.getAttribute('data-section');
+                    const form = document.getElementById(`${section}-edit-form`);
+                    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+                });
+            });
+
+            // Обработчики для редактируемых полей
+            document.querySelectorAll('.editable').forEach(item => {
+                item.addEventListener('click', function() {
+                    const field = this.getAttribute('data-field');
+                    const form = document.getElementById(`${field}-edit-form`);
+                    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+                });
+            });
+
+            // Обработчик кнопки редактирования профиля
+            document.getElementById('edit-profile-btn').addEventListener('click', function() {
+                document.getElementById('profile-edit-modal').style.display = 'flex';
+            });
+
+            // Обработчик вкладок заявок
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    document.querySelectorAll('.application-list').forEach(list => {
+                        list.style.display = 'none';
+                    });
+                    
+                    const tabName = btn.getAttribute('data-tab');
+                    document.getElementById(`${tabName}-list`).style.display = 'block';
+                });
+            });
+
+            // Функции для работы с навыками
+            function addSkill() {
+                const input = document.getElementById('new-skill-input');
+                const skill = input.value.trim();
+                
+                if (skill && !document.querySelector(`.skill:contains("${skill}")`)) {
+                    const skillElement = document.createElement('span');
+                    skillElement.className = 'skill';
+                    skillElement.innerHTML = `${skill} <span class="skill-remove" onclick="removeSkill('${skill}')">&times;</span>`;
+                    document.getElementById('skills-list').appendChild(skillElement);
+                    input.value = '';
+                }
+            }
+
+            function removeSkill(skill) {
+                const skills = document.querySelectorAll('.skill');
+                skills.forEach(s => {
+                    if (s.textContent.trim().replace('×', '').trim() === skill) {
+                        s.remove();
+                    }
+                });
+            }
+
+            function saveSkills() {
+                const skills = Array.from(document.querySelectorAll('.skill')).map(s => 
+                    s.textContent.trim().replace('×', '').trim()
+                ).filter(s => s);
+                
+                // Отправка на сервер
+                fetch('/update-skills', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ skills: skills.join(',') })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        cancelEdit('skills');
+                    } else {
+                        alert('Ошибка при сохранении навыков');
+                    }
+                });
+            }
+
+            // Функции для сохранения полей
+            function saveField(field) {
+                const value = document.getElementById(`${field}-input`).value;
+                
+                fetch('/update-profile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ field: field, value: value })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.querySelector(`[data-field="${field}"]`).textContent = value || 'Не указано';
+                        cancelEdit(field);
+                    } else {
+                        alert('Ошибка при сохранении');
+                    }
+                });
+            }
+
+            function savePhone() {
+                const code = document.getElementById('phone-code-input').value;
+                const number = document.getElementById('phone-number-input').value;
+                
+                fetch('/update-profile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        field: 'phone', 
+                        phone_code: code,
+                        phone_number: number
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.querySelector('[data-field="phone"]').textContent = 
+                            code && number ? `+${code} ${number}` : 'Не указан';
+                        cancelEdit('phone');
+                    } else {
+                        alert('Ошибка при сохранении телефона');
+                    }
+                });
+            }
+
+            function saveSalary() {
+                const salary = document.getElementById('min-salary-input').value;
+                const currency = document.getElementById('currency-select').value;
+                
+                fetch('/update-profile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        field: 'salary', 
+                        min_salary: salary,
+                        currency: currency
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.querySelector('[data-field="min_salary"]').textContent = 
+                            salary ? `${salary} ${currency}` : 'Не указана';
+                        cancelEdit('salary');
+                    } else {
+                        alert('Ошибка при сохранении зарплатных ожиданий');
+                    }
+                });
+            }
+
+            function saveProfile() {
+                const firstName = document.getElementById('first-name-input').value;
+                const lastName = document.getElementById('last-name-input').value;
+                const title = document.getElementById('title-input').value;
+                const city = document.getElementById('city-input').value;
+                
+                fetch('/update-profile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        first_name: firstName,
+                        last_name: lastName,
+                        desired_offer_title: title,
+                        city: city
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('user-name').textContent = `${firstName} ${lastName}`;
+                        document.getElementById('user-title').textContent = title || 'Не указано';
+                        document.getElementById('user-city').textContent = city || 'Город не указан';
+                        document.getElementById('profile-edit-modal').style.display = 'none';
+                    } else {
+                        alert('Ошибка при сохранении профиля');
+                    }
+                });
+            }
+
+            function cancelEdit(field) {
+                document.getElementById(`${field}-edit-form`).style.display = 'none';
+            }
+
+            // Загрузка аватара
+            document.getElementById('avatar-upload').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const formData = new FormData();
+                    formData.append('avatar', file);
+                    
+                    fetch('/upload-avatar', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('user-avatar').src = data.avatar_url + '?' + new Date().getTime();
+                        } else {
+                            alert('Ошибка при загрузке аватара');
+                        }
+                    });
+                }
+            });
+
+            // Загрузка резюме
+            document.getElementById('resume-upload').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const formData = new FormData();
+                    formData.append('resume', file);
+                    
+                    fetch('/upload-resume', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload(); // Перезагружаем страницу для отображения нового резюме
+                        } else {
+                            alert('Ошибка при загрузке резюме');
+                        }
+                    });
+                }
+            });
+
+            function deleteResume(resumeId) {
+                if (confirm('Вы уверены, что хотите удалить это резюме?')) {
+                    fetch(`/delete-resume/${resumeId}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload(); // Перезагружаем страницу
+                        } else {
+                            alert('Ошибка при удалении резюме');
+                        }
+                    });
+                }
+            }
+        </script>
+    </body>
+    </html>

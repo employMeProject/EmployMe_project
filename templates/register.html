@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration - Step 1</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/register.css') }}">
+</head>
+<body>
+    <div class="form-container">
+        <!-- Прогресс-бар -->
+        <div class="progress-bar">
+            <div class="progress-step step-1"></div>
+            <div class="progress-step step-2"></div>
+            <div class="progress-step step-3"></div>
+            <div class="progress-step step-4"></div>
+        </div>
+
+        <!-- Шаг 1 -->
+        <form class="registration-form" method="POST" action="{{ url_for('register_step_2') }}">
+            <h2>Step 1: Personal Information</h2>
+            <label for="name">Name:</label>
+            <input type="text" name="name" id="name" required>
+
+            <label for="lastname">Last Name:</label>
+            <input type="text" name="lastname" id="lastname" required>
+
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" required>
+
+            <label for="phone">Phone Number:</label>
+            <input type="tel" name="phone" id="phone" required>
+
+            <button type="submit" class="continue-button">Continue</button>
+        </form>
+    </div>
+
+    <script>
+        // Для анимации прогресса и скрытия/показа шагов
+        document.addEventListener('DOMContentLoaded', function () {
+            let currentStep = 1; // Начальный шаг
+            const totalSteps = 4;
+
+            function updateProgress(step) {
+                for (let i = 1; i <= totalSteps; i++) {
+                    const stepElement = document.querySelector(`.step-${i}`);
+                    if (i <= step) {
+                        stepElement.classList.add('completed');
+                    } else {
+                        stepElement.classList.remove('completed');
+                    }
+                }
+            }
+
+            updateProgress(currentStep);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 1: Primary Info</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/register.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+</head>
+<body>
+    {% include "_header.html" %}
+    <div class="form-wrapper">
+        <div class="top-bar">
+            <span class="back-arrow"></span>
+            <div class="progress-bar">
+                <div class="progress-filled" style="width: 15%;"></div>
+            </div>
+            <span class="save-exit">Save And Exit</span>
+        </div>
+
+        <h2>Give Us Your Primary Information</h2>
+
+        <form method="POST" class="form-grid">
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" placeholder="Write Your Name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" placeholder="Write Your Last Name" name="lastname" required>
+            </div>
+            <div class="form-group">
+                <label>Email*</label>
+                <input type="email" placeholder="Email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number*</label>
+                <div class="phone-group">
+                    <select name="country_code" class="country-code">
+                        <option value="+996">🇰🇬 +996</option>
+                        <option value="+7">🇷🇺 +7</option>
+                        <option value="+91">🇮🇳 +91</option>
+                        <option value="+1">🇺🇸 +1</option>
+                        <option value="+44">🇬🇧 +44</option>
+                        <!-- можно добавить другие -->
+                    </select>
+                    <input type="tel" name="phone" placeholder="Phone number" required>                    
+                </div>
+            </div>
+            <button type="submit" class="continue-btn">Continue</button>
+        </form>
+        <img src="/static/images/step_1_people.png" alt="" class="img_1_people">
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
+    <script>
+    const input = document.querySelector("#phone");
+    window.intlTelInput(input, {
+        initialCountry: "kg",
+        preferredCountries: ["kg", "ru", "us", "in"],
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+    });
+    </script>
+
+</body>
+</html>

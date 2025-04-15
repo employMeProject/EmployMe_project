@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+
+
+  form {
+    background: white;
+    margin-top: 40px;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    margin-top: 50px;
+  }
+
+  form h2 {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="file"],
+  textarea {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    transition: border-color 0.2s ease-in-out;
+  }
+
+  input[type="file"]::file-selector-button {
+    background: #1e3a8a;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    margin-right: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+
+  input:focus,
+  textarea:focus {
+    border-color: #2563eb;
+    outline: none;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  button[type="submit"] {
+    width: 100%;
+    background-color: #1e3a8a;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  button[type="submit"]:hover {
+    background-color: #3b82f6;
+  }
+
+</style>
+<body>
+  {%include "_header.html"%}
+    <form method="POST" enctype="multipart/form-data" class="space-y-4 max-w-xl mx-auto p-6 bg-white rounded shadow">
+        <h2 class="text-2xl font-bold text-center">Upload Your Resume</h2>
+      
+        <input type="text" name="name" placeholder="First Name" required class="w-full p-2 border rounded">
+        <input type="text" name="last_name" placeholder="Last Name" required class="w-full p-2 border rounded">
+        <input type="email" name="email" placeholder="Email" required class="w-full p-2 border rounded">
+        <input type="tel" name="phone_number" placeholder="Phone Number" required class="w-full p-2 border rounded">
+      
+        <label class="block">
+          <span>Resume</span>
+          <input type="file" name="resume" accept=".pdf" required class="w-full p-2 border rounded">
+        </label>
+      
+        <label class="block">
+          <span>Portfolio</span>
+          <input type="file" name="portfolio" accept=".pdf" required class="w-full p-2 border rounded">
+        </label>
+      
+        <textarea name="cover_letter" placeholder="Cover Letter (optional)" class="w-full p-2 border rounded" rows="4"></textarea>
+      
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded w-full">Submit</button>
+      </form>
+      {%include "_footer.html"%}
+</body>
+</html>
