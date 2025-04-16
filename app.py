@@ -55,6 +55,25 @@ class Company(db.Model):
     name = db.Column(db.String(100), nullable=False)
     website = db.Column(db.String(200))
     about = db.Column(db.Text)
+    photo = db.Column(db.String(200))
+    size = db.Column(db.Integer)
+    contact_info = db.Column(db.Text, nullable=False)
+    document = db.Column(db.String(200))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Связи
+    job_offers = db.relationship('JobOffer', back_populates='company', lazy=True)
+class CompanyEmployee(db.Model):
+    __tablename__ = 'company_employees'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
+
+    # Добавь при необходимости: relationship
+    user = db.relationship('User', backref='company_employee')
+    company = db.relationship('Company', backref='employees')
+
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -73,51 +92,92 @@ class User(UserMixin, db.Model):
     reset_token = db.Column(db.String(100))
     avatar = db.Column(db.String(200))
     about = db.Column(db.Text)
-    skills = db.Column(db.String(500))  # Добавляем это поле
-    resumes = db.relationship('Resume', backref='user', lazy=True)
-    def __repr__(self):
-        return f'<User {self.username}'
-class Application(db.Model):
-    __tablename__ = 'applications'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    resume_id = db.Column(db.Integer, db.ForeignKey('resumes.id'), nullable=False)
-    job_offer_id = db.Column(db.Integer, db.ForeignKey('job_offers.id'), nullable=False)
-    status = db.Column(db.String(20), default='under_review')
+    skills = db.Column(db.String(500))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
-    message = db.Column(db.Text)
     
     # Связи
-    user = db.relationship('User', backref='applications')
-    resume = db.relationship('Resume', backref='applications')
-    job_offer = db.relationship('JobOffer', backref='applications')
-# Добавьте модель JobOffer
+    resumes = db.relationship('Resume', back_populates='user', lazy=True)
+    applications = db.relationship('Application', back_populates='applicant', lazy=True)
+    job_offers = db.relationship('JobOffer', back_populates='author', lazy=True)
+    posted_jobs = db.relationship('JobOffer', back_populates='user', lazy='dynamic')
+    def __repr__(self):
+        return f'<User {self.username}>'
+
 class JobOffer(db.Model):
     __tablename__ = 'job_offers'
     id = db.Column(db.Integer, primary_key=True)
-    job_title = db.Column(db.String(100))
-    location = db.Column(db.String(100))
-    job_type = db.Column(db.String(50))
+    job_title = db.Column(db.String(100), nullable=False)
+    location = db.Column(db.String(100), nullable=False)
+    category = db.Column(db.String(100), nullable=False)
+    job_type = db.Column(db.String(50), nullable=False)
     describe_position = db.Column(db.Text)
+    unique_journey = db.Column(db.Text)
+    employee_expectations = db.Column(db.Text)
+    employee_contribution = db.Column(db.Text)
+    team_description = db.Column(db.Text)
+    interview_process = db.Column(db.Text)
     salary_range = db.Column(db.String(100))
-    company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
+    benefits = db.Column(db.Text)
+    payment_frequency = db.Column(db.String(50))
+    
+    # Foreign keys
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))  # внешний ключ
+    user = db.relationship('User', back_populates='posted_jobs')  # это и есть нужное свойство
+    company_id = db.Column(db.Integer, db.ForeignKey('companies.id'), nullable=False)
+    
+    # Relationships
+    company = db.relationship('Company', back_populates='job_offers')
+    author = db.relationship('User', back_populates='job_offers')  # Changed from 'posted_jobs'
+    applications = db.relationship('Application', back_populates='job_offer', lazy=True)
+
+
 class Resume(db.Model):
     __tablename__ = 'resumes'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
-    last_name = db.Column(db.String(100))
+    name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120))
     phone_number = db.Column(db.String(20))
     resume_path = db.Column(db.String(200))
     portfolio_path = db.Column(db.String(200))
     cover_letter = db.Column(db.Text)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
+    
+    # Внешний ключ
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    # Связи
+    user = db.relationship('User', back_populates='resumes')
+    applications = db.relationship('Application', back_populates='resume', lazy=True)
+
+class Application(db.Model):
+    __tablename__ = 'applications'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    status = db.Column(db.String(20), default='under_review')
+    message = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+    
+    # Foreign keys
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    resume_id = db.Column(db.Integer, db.ForeignKey('resumes.id'), nullable=False)
+    job_offer_id = db.Column(db.Integer, db.ForeignKey('job_offers.id'), nullable=False)
+    
+    # Relationships
+    applicant = db.relationship('User', back_populates='applications')
+    resume = db.relationship('Resume', back_populates='applications')
+    job_offer = db.relationship('JobOffer', back_populates='applications')  # This is correct
 def generate_token(length=24):
     chars = string.ascii_letters + string.digits
     return ''.join(secrets.choice(chars) for _ in range(length))
 
+@app.route('/job/<int:job_id>')
+def job_details(job_id):
+    job = JobOffer.query.get_or_404(job_id)
+    company = Company.query.get(job.company_id)
+    return render_template('job_details.html', job=job, company=company)
+    
 @app.route('/apply/<int:job_id>', methods=['GET', 'POST'])
 @login_required
 def apply_for_job(job_id):
@@ -153,7 +213,7 @@ def apply_for_job(job_id):
     return render_template('apply_job.html', 
                          job=job,
                          resume=resume,
-                         company=job.company_id)
+                         company=job.company)
 
 @app.route('/application/<int:app_id>/update_status', methods=['POST'])
 @login_required
@@ -542,33 +602,163 @@ def allowed_file(filename):
 @app.route('/success')
 def success():
     return(render_template('success.html'))
-@app.route('/company/profile')
+@app.route('/company/register', methods=['GET', 'POST'])
+def company_register():
+    if request.method == 'POST':
+        try:
+            # Создаем пользователя-представителя компании
+            user = User(
+                username=request.form['username'],
+                password=generate_password_hash(request.form['password']),
+                email=request.form['email'],
+                first_name=request.form['contact_name'],
+                phone_number=request.form['phone']
+            )
+            db.session.add(user)
+            db.session.flush()  # Получаем ID пользователя
+            
+            # Создаем компанию
+            company = Company(
+                name=request.form['company_name'],
+                website=request.form.get('website'),
+                about=request.form.get('about'),
+                contact_info=f"{request.form['contact_name']}, {request.form['email']}, {request.form['phone']}",
+                size=request.form.get('size')
+            )
+            
+            # Обработка загрузки файлов
+            if 'photo' in request.files:
+                photo = request.files['photo']
+                if photo.filename != '':
+                    filename = secure_filename(photo.filename)
+                    photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    photo.save(photo_path)
+                    company.photo = filename
+            
+            if 'document' in request.files:
+                document = request.files['document']
+                if document.filename != '':
+                    filename = secure_filename(document.filename)
+                    document_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    document.save(document_path)
+                    company.document = filename
+            
+            db.session.add(company)
+            db.session.flush()  # Получаем ID компании
+            
+            # Связываем пользователя с компанией
+            employee = CompanyEmployee(
+                company_id=company.id,
+                user_id=user.id,
+                role='admin'  # Первый пользователь - администратор
+            )
+            db.session.add(employee)
+            
+            db.session.commit()
+            
+            login_user(user)
+            return redirect(url_for('company_dashboard'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Ошибка регистрации: {str(e)}', 'error')
+    
+    return render_template('company/register.html')
+
+@app.route('/company/login', methods=['GET', 'POST'])
+def company_login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        user = User.query.filter_by(username=username).first()
+        
+        if user and check_password_hash(user.password, password):
+            # Проверяем, что пользователь связан с компанией
+            employee = CompanyEmployee.query.filter_by(user_id=user.id).first()
+            if employee:
+                login_user(user)
+                next_page = request.args.get('next')
+                return redirect(next_page or url_for('company_dashboard'))
+            
+        flash('Неверные данные или пользователь не является представителем компании', 'error')
+    
+    return render_template('company/login.html')
+
+@app.route('/company/dashboard')
 @login_required
-def company_profile():
-    # В реальном приложении вам нужно определить, является ли текущий пользователь работодателем
-    # Это может быть через отдельную модель Employer или флаг в User модели
+def company_dashboard():
+    # Проверяем, что пользователь связан с компанией
+    employee = CompanyEmployee.query.filter_by(user_id=current_user.id).first()
+    if not employee:
+        return redirect(url_for('company_login'))
     
-    # Получаем компанию текущего пользователя (в этом примере предполагаем, что у пользователя одна компания)
-    company = Company.query.filter_by(contact_email=current_user.email).first()
-    
+    company = Company.query.get(employee.company_id)
     if not company:
-        flash('You need to register a company first', 'warning')
-        return redirect(url_for('register_company'))
+        flash('Компания не найдена', 'error')
+        return redirect(url_for('company_login'))
     
-    # Получаем все заявки для всех вакансий компании
-    applications_count = db.session.query(Application).join(JobOffer).filter(
-        JobOffer.company_id == company.id
-    ).count()
+    # Получаем вакансии компании
+    jobs = JobOffer.query.filter_by(company_id=company.id).all()
     
-    # Последние 5 заявок
-    recent_applications = db.session.query(Application).join(JobOffer).filter(
+    # Получаем заявки на вакансии компании
+    applications = Application.query.join(JobOffer).filter(
         JobOffer.company_id == company.id
     ).order_by(Application.created_at.desc()).limit(5).all()
     
-    return render_template('company_profile.html',
+    return render_template('company/dashboard.html',
                          company=company,
-                         applications_count=applications_count,
-                         recent_applications=recent_applications)
+                         jobs=jobs,
+                         applications=applications)
+
+@app.route('/company/profile/edit', methods=['GET', 'POST'])
+@login_required
+def edit_company_profile():
+    employee = CompanyEmployee.query.filter_by(user_id=current_user.id).first()
+    if not employee:
+        return redirect(url_for('company_login'))
+    
+    company = Company.query.get(employee.company_id)
+    if not company:
+        flash('Компания не найдена', 'error')
+        return redirect(url_for('company_login'))
+    
+    if request.method == 'POST':
+        try:
+            company.name = request.form['name']
+            company.website = request.form.get('website')
+            company.about = request.form['about']
+            company.size = request.form.get('size')
+            
+            # Обновление контактной информации через пользователя
+            current_user.email = request.form['email']
+            current_user.phone_number = request.form['phone']
+            
+            # Обработка загрузки нового логотипа
+            if 'photo' in request.files:
+                photo = request.files['photo']
+                if photo.filename != '':
+                    # Удаляем старый файл, если он есть
+                    if company.photo:
+                        old_path = os.path.join(app.config['UPLOAD_FOLDER'], company.photo)
+                        if os.path.exists(old_path):
+                            os.remove(old_path)
+                    
+                    filename = secure_filename(photo.filename)
+                    photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    photo.save(photo_path)
+                    company.photo = filename
+            
+            db.session.commit()
+            flash('Профиль компании успешно обновлен', 'success')
+            return redirect(url_for('company_dashboard'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Ошибка обновления: {str(e)}', 'error')
+    
+    return render_template('company/edit_profile.html', company=company)
+
 
 @app.route('/company/job/create', methods=['GET', 'POST'])
 @login_required
@@ -806,7 +996,7 @@ def download_resume(resume_id):
         resume.resume_path,
         as_attachment=True,
         download_name=f"resume_{resume.id}.{resume.resume_path.split('.')[-1]}"
-    )
+    )   
 
 # Удаление резюме
 @app.route('/delete-resume/<int:resume_id>', methods=['DELETE'])

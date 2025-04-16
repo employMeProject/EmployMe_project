@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация компании | Business Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --gray-color: #6c757d;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+
+        
+        .registration-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 100%;
+            max-width: 800px;
+            padding: 40px;
+            transition: var(--transition);
+            margin: 0 auto;
+            margin-top: 50px;
+        }
+        
+        .registration-container:hover {
+            box-shadow: 0 8px 30px rgba(67, 97, 238, 0.15);
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 700;
+            font-size: 28px;
+        }
+        
+        h3 {
+            color: var(--secondary-color);
+            margin: 25px 0 20px;
+            font-weight: 600;
+            font-size: 22px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+        
+        label:after {
+            content: "*";
+            color: #dc3545;
+            margin-left: 4px;
+            display: none;
+        }
+        
+        label.required:after {
+            display: inline;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f8f9fa;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(72, 149, 239, 0.2);
+        }
+        
+        input[type="file"] {
+            padding: 10px;
+            background-color: transparent;
+            border: 2px dashed #e9ecef;
+        }
+        
+        input[type="file"]:focus {
+            border-color: var(--accent-color);
+        }
+        
+        hr {
+            border: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #e9ecef, transparent);
+            margin: 30px 0;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 20px;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .file-hint {
+            font-size: 13px;
+            color: var(--gray-color);
+            margin-top: 5px;
+            font-weight: 400;
+        }
+        
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+            
+            .registration-container {
+                padding: 30px 20px;
+            }
+            
+            h2 {
+                font-size: 24px;
+            }
+            
+            h3 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include '_header.html' %}
+    <div class="registration-container">
+        <h2>Регистрация компании</h2>
+        
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label class="required">Название компании</label>
+                <input type="text" name="company_name" required placeholder="Введите официальное название компании">
+            </div>
+            
+            <div class="form-group">
+                <label>Веб-сайт</label>
+                <input type="url" name="website" placeholder="https://example.com">
+            </div>
+            
+            <div class="form-group">
+                <label class="required">О компании</label>
+                <textarea name="about" required placeholder="Опишите деятельность вашей компании"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Количество сотрудников</label>
+                <input type="number" name="size" placeholder="Укажите количество сотрудников">
+            </div>
+            
+            <div class="two-columns">
+                <div class="form-group">
+                    <label class="required">Контактное лицо</label>
+                    <input type="text" name="contact_name" required placeholder="ФИО контактного лица">
+                </div>
+                
+                <div class="form-group">
+                    <label class="required">Email</label>
+                    <input type="email" name="email" required placeholder="contact@example.com">
+                </div>
+            </div>
+            
+            <div class="two-columns">
+                <div class="form-group">
+                    <label class="required">Телефон</label>
+                    <input type="tel" name="phone" required placeholder="+7 (XXX) XXX-XX-XX">
+                </div>
+                
+                <div class="form-group">
+                    <label>Логотип</label>
+                    <input type="file" name="photo" accept="image/*">
+                    <p class="file-hint">Рекомендуемый формат: JPG, PNG (макс. 5MB)</p>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Документы компании (PDF)</label>
+                <input type="file" name="document" accept=".pdf">
+                <p class="file-hint">Можно загрузить реквизиты, свидетельство о регистрации</p>
+            </div>
+            
+            <hr>
+            
+            <h3>Данные для входа</h3>
+            
+            <div class="two-columns">
+                <div class="form-group">
+                    <label class="required">Логин</label>
+                    <input type="text" name="username" required placeholder="Придумайте логин">
+                </div>
+                
+                <div class="form-group">
+                    <label class="required">Пароль</label>
+                    <input type="password" name="password" required placeholder="Не менее 8 символов">
+                </div>
+            </div>
+            
+            <button type="submit">Зарегистрировать компанию</button>
+        </form>
+    </div>
+</body>
+</html>

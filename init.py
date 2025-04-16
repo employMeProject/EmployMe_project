@@ -1,23 +1,14 @@
 import sqlite3
-from pathlib import Path
+from datetime import datetime
 
-# Путь к вашей базе данных (обычно в папке instance)
-db_path =  "mydatabase.db"
-conn = sqlite3.connect(db_path)
+# Подключение к базе данных
+conn = sqlite3.connect('mydatabase.db')
 cursor = conn.cursor()
-# Список нужных колонок
-columns_to_add = {
-    "avatar": "TEXT",
-    "about": "TEXT",
-    "skills": "TEXT"
-}
 
-for column, column_type in columns_to_add.items():
-    try:
-        cursor.execute(f"ALTER TABLE users ADD COLUMN {column} {column_type}")
-        print(f"Колонка '{column}' добавлена.")
-    except sqlite3.OperationalError as e:
-        print(f"Колонка '{column}' уже существует или другая ошибка: {e}")
+# Получаем информацию о колонках таблицы, например "users"
+cursor.execute("PRAGMA table_info(companies);")  # замени 'users' на свою таблицу
+columns = cursor.fetchall()
 
-conn.commit()
-conn.close()
+# Выводим названия колонок
+for col in columns:
+    print(col[1])  # col[1] — это имя колонки

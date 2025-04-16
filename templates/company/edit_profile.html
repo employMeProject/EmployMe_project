@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Редактирование профиля компании</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <div>
+            <label>Название компании*</label>
+            <input type="text" name="name" value="{{ company.name }}" required>
+        </div>
+        
+        <div>
+            <label>Веб-сайт</label>
+            <input type="url" name="website" value="{{ company.website or '' }}">
+        </div>
+        
+        <div>
+            <label>О компании*</label>
+            <textarea name="about" required>{{ company.about }}</textarea>
+        </div>
+        
+        <div>
+            <label>Количество сотрудников</label>
+            <input type="number" name="size" value="{{ company.size or '' }}">
+        </div>
+        
+        <div>
+            <label>Email*</label>
+            <input type="email" name="email" value="{{ current_user.email }}" required>
+        </div>
+        
+        <div>
+            <label>Телефон*</label>
+            <input type="tel" name="phone" value="{{ current_user.phone_number }}" required>
+        </div>
+        
+        <div>
+            <label>Логотип</label>
+            {% if company.photo %}
+            <p>Текущий логотип: <a href="{{ url_for('static', filename='uploads/' + company.photo) }}" target="_blank">Просмотреть</a></p>
+            {% endif %}
+            <input type="file" name="photo" accept="image/*">
+        </div>
+        
+        <button type="submit">Сохранить изменения</button>
+    </form>
+</body>
+</html>
