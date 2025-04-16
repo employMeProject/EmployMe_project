@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Создание вакансии | Business Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #4895ef;
+            --bg: #f8f9fa;
+            --white: #ffffff;
+            --text: #212529;
+            --shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            --border-radius: 10px;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 0;
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary);
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        form input,
+        form textarea,
+        form select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ced4da;
+            border-radius: var(--border-radius);
+            font-size: 15px;
+            background-color: #fefefe;
+        }
+
+        form textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: var(--secondary);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Создание вакансии</h1>
+        <form method="POST">
+            <label for="job_title">Название должности</label>
+            <input type="text" name="job_title" id="job_title" required>
+
+            <label for="location">Местоположение</label>
+            <input type="text" name="location" id="location" required>
+
+            <label for="job_type">Тип занятости</label>
+            <select name="job_type" id="job_type" required>
+                <option value="Полная занятость">Полная занятость</option>
+                <option value="Частичная занятость">Частичная занятость</option>
+                <option value="Удалённая работа">Удалённая работа</option>
+                <option value="Стажировка">Стажировка</option>
+            </select>
+
+            <label for="salary_range">Зарплата</label>
+            <input type="text" name="salary_range" id="salary_range" placeholder="Например: от 40 000 до 60 000 сом">
+
+            <label for="description">Описание</label>
+            <textarea name="description" id="description" required></textarea>
+
+            <button type="submit">Создать вакансию</button>
+        </form>
+
+        <div class="back-link">
+            <a href="{{ url_for('company_profile') }}">← Вернуться в профиль компании</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -12,6 +12,7 @@ import string
 import time
 from flask_migrate import Migrate
 from datetime import datetime
+from sqlalchemy import text
 from flask_login import current_user
 app = Flask(__name__)
 
@@ -51,6 +52,7 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 class Company(db.Model):
     __tablename__ = 'companies'
+    
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     website = db.Column(db.String(200))
@@ -61,8 +63,32 @@ class Company(db.Model):
     document = db.Column(db.String(200))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # Связи
+    # Добавленные поля для аутентификации
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(256), nullable=False)
+    
+    # Связи с другими таблицами
     job_offers = db.relationship('JobOffer', back_populates='company', lazy=True)
+    employees = db.relationship('CompanyEmployee', back_populates='company', lazy=True)
+
+    def __repr__(self):
+        return f'<Company {self.name}>'
+    
+    # Методы для Flask-Login
+    def get_id(self):
+        return self.id
+    
+    @property
+    def is_authenticated(self):
+        return True
+    
+    @property
+    def is_active(self):
+        return True
+    
+    @property
+    def is_anonymous(self):
+        return False
 class CompanyEmployee(db.Model):
     __tablename__ = 'company_employees'
     
@@ -70,9 +96,10 @@ class CompanyEmployee(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
 
-    # Добавь при необходимости: relationship
+    # Добавим уникальное имя для backref
     user = db.relationship('User', backref='company_employee')
-    company = db.relationship('Company', backref='employees')
+    company = db.relationship('Company', backref='company_employees')  # изменено с 'employees' на 'company_employees'
+
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -606,110 +633,142 @@ def success():
 def company_register():
     if request.method == 'POST':
         try:
-            # Создаем пользователя-представителя компании
-            user = User(
-                username=request.form['username'],
-                password=generate_password_hash(request.form['password']),
-                email=request.form['email'],
-                first_name=request.form['contact_name'],
-                phone_number=request.form['phone']
+            # Проверка уникальности email и username
+            existing_user = db.session.execute(
+                text("SELECT * FROM users WHERE email = :email"), {'email': request.form['email']}
+            ).fetchone()
+
+            if existing_user:
+                flash('Пользователь с таким email уже существует', 'error')
+                return redirect(url_for('company_register'))
+
+            # Создание записи в таблице Company
+            db.session.execute(
+                text("""
+                    INSERT INTO companies (name, website, about, contact_info, size, username, password)
+                    VALUES (:name, :website, :about, :contact_info, :size, :username, :password)
+                """),
+                {
+                    'name': request.form['company_name'],
+                    'website': request.form.get('website'),
+                    'about': request.form.get('about', ''),
+                    'contact_info': f"{request.form['contact_name']}, {request.form['email']}, {request.form['phone']}",
+                    'size': request.form.get('size', 0),
+                    'username': request.form['username'],
+                    'password': generate_password_hash(request.form['password'])
+                }
             )
-            db.session.add(user)
-            db.session.flush()  # Получаем ID пользователя
-            
-            # Создаем компанию
-            company = Company(
-                name=request.form['company_name'],
-                website=request.form.get('website'),
-                about=request.form.get('about'),
-                contact_info=f"{request.form['contact_name']}, {request.form['email']}, {request.form['phone']}",
-                size=request.form.get('size')
-            )
-            
-            # Обработка загрузки файлов
-            if 'photo' in request.files:
-                photo = request.files['photo']
-                if photo.filename != '':
-                    filename = secure_filename(photo.filename)
-                    photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                    photo.save(photo_path)
-                    company.photo = filename
-            
-            if 'document' in request.files:
-                document = request.files['document']
-                if document.filename != '':
-                    filename = secure_filename(document.filename)
-                    document_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                    document.save(document_path)
-                    company.document = filename
-            
-            db.session.add(company)
-            db.session.flush()  # Получаем ID компании
-            
-            # Связываем пользователя с компанией
-            employee = CompanyEmployee(
-                company_id=company.id,
-                user_id=user.id,
-                role='admin'  # Первый пользователь - администратор
-            )
-            db.session.add(employee)
-            
+
+            # Сохраняем изменения в БД
             db.session.commit()
-            
-            login_user(user)
+
+            flash('Компания успешно зарегистрирована!', 'success')
             return redirect(url_for('company_dashboard'))
-            
+        
         except Exception as e:
             db.session.rollback()
             flash(f'Ошибка регистрации: {str(e)}', 'error')
     
     return render_template('company/register.html')
 
+
 @app.route('/company/login', methods=['GET', 'POST'])
 def company_login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        
-        user = User.query.filter_by(username=username).first()
-        
-        if user and check_password_hash(user.password, password):
-            # Проверяем, что пользователь связан с компанией
-            employee = CompanyEmployee.query.filter_by(user_id=user.id).first()
-            if employee:
-                login_user(user)
-                next_page = request.args.get('next')
-                return redirect(next_page or url_for('company_dashboard'))
-            
-        flash('Неверные данные или пользователь не является представителем компании', 'error')
-    
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM companies WHERE username = ?", (username,))
+        company = cursor.fetchone()
+
+        if company:
+            if check_password_hash(company['password'], password):
+                session['company_id'] = company['id']
+                session['company_name'] = company['name']
+                session['is_company'] = True
+                return redirect(url_for('company_dashboard'))
+            else:
+                flash("Неверный пароль", "error")
+        else:
+            flash("Компания не найдена", "error")
+
+        conn.close()
+
     return render_template('company/login.html')
 
+
+
 @app.route('/company/dashboard')
-@login_required
 def company_dashboard():
-    # Проверяем, что пользователь связан с компанией
-    employee = CompanyEmployee.query.filter_by(user_id=current_user.id).first()
-    if not employee:
+    if 'company_id' not in session:
         return redirect(url_for('company_login'))
-    
-    company = Company.query.get(employee.company_id)
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Получаем данные компании
+    cursor.execute("SELECT * FROM companies WHERE id = ?", (session['company_id'],))
+    company = cursor.fetchone()
+
     if not company:
         flash('Компания не найдена', 'error')
         return redirect(url_for('company_login'))
-    
-    # Получаем вакансии компании
-    jobs = JobOffer.query.filter_by(company_id=company.id).all()
-    
-    # Получаем заявки на вакансии компании
-    applications = Application.query.join(JobOffer).filter(
-        JobOffer.company_id == company.id
-    ).order_by(Application.created_at.desc()).limit(5).all()
-    
+
+    # Вакансии
+    cursor.execute("SELECT * FROM job_offers WHERE company_id = ?", (company['id'],))
+    jobs = cursor.fetchall()
+
+    # Заявки
+    cursor.execute("""
+        SELECT a.* FROM applications a
+        JOIN job_offers j ON a.job_offer_id = j.id
+        WHERE j.company_id = ?
+        ORDER BY a.created_at DESC
+        LIMIT 5
+    """, (company['id'],))
+    applications = cursor.fetchall()
+
+    conn.close()
+
     return render_template('company/dashboard.html',
-                         company=company,
-                         jobs=jobs,
-                         applications=applications)
+                           company=company,
+                           jobs=jobs,
+                           applications=applications)
+@app.route('/company/jobs')
+def company_jobs():
+    # Проверяем, залогинена ли компания
+    if 'company_id' not in session:
+        flash('Пожалуйста, войдите в аккаунт компании', 'error')
+        return redirect(url_for('company_login'))
+
+    company_id = session['company_id']
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Получаем компанию
+    cursor.execute("SELECT * FROM companies WHERE id = ?", (company_id,))
+    company = cursor.fetchone()
+    if not company:
+        flash('Компания не найдена', 'error')
+        return redirect(url_for('company_login'))
+
+    # Получаем вакансии компании
+    cursor.execute("""
+        SELECT * FROM job_offers 
+        WHERE company_id = ? 
+    """, (company_id,))
+    jobs = cursor.fetchall()
+
+    conn.close()
+
+    return render_template('company_jobs.html', 
+                           company=company,
+                           jobs=jobs)
+
 
 @app.route('/company/profile/edit', methods=['GET', 'POST'])
 @login_required
@@ -760,33 +819,34 @@ def edit_company_profile():
     return render_template('company/edit_profile.html', company=company)
 
 
-@app.route('/company/job/create', methods=['GET', 'POST'])
-@login_required
+@app.route('/company/create_job_offer', methods=['GET', 'POST'])
 def create_job_offer():
+    # Ищем компанию по почте текущего пользователя
     company = Company.query.filter_by(contact_email=current_user.email).first()
     if not company:
-        flash('You need to register a company first', 'warning')
+        flash('Сначала зарегистрируйте компанию', 'warning')
         return redirect(url_for('register_company'))
-    
+
     if request.method == 'POST':
         try:
             job = JobOffer(
-                job_title=request.form['job_title'],
-                location=request.form['location'],
-                job_type=request.form['job_type'],
-                describe_position=request.form['description'],
-                salary_range=request.form['salary_range'],
+                job_title=request.form.get('job_title'),
+                location=request.form.get('location'),
+                job_type=request.form.get('job_type'),
+                describe_position=request.form.get('description'),
+                salary_range=request.form.get('salary_range'),
                 company_id=company.id
             )
             db.session.add(job)
             db.session.commit()
-            flash('Job offer created successfully!', 'success')
+            flash('Вакансия успешно создана!', 'success')
             return redirect(url_for('company_profile'))
         except Exception as e:
             db.session.rollback()
-            flash('Error creating job offer', 'error')
-    
-    return render_template('create_job_offer.html')
+            flash('Ошибка при создании вакансии', 'error')
+            print(f'Ошибка: {e}')  # Для отладки, можно убрать
+
+    return render_template('company/create_job_offer.html')
 
 @app.route('/company/job/<int:job_id>/applications')
 @login_required

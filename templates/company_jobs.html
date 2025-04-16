@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ company.name }} - Job Listings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4bb543;
+            --warning-color: #f0ad4e;
+            --danger-color: #d9534f;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #f5f7fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: white;
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 24px;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-color);
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .main-content {
+            padding: 40px 0;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #c9302c;
+        }
+
+        .jobs-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .job-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .job-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .job-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .job-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--dark-color);
+        }
+
+        .job-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .job-meta i {
+            margin-right: 5px;
+        }
+
+        .job-body {
+            padding: 20px;
+        }
+
+        .job-description {
+            margin-bottom: 15px;
+            color: #495057;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .job-footer {
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .job-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .no-jobs {
+            text-align: center;
+            padding: 50px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .no-jobs i {
+            font-size: 50px;
+            color: #adb5bd;
+            margin-bottom: 20px;
+        }
+
+        .no-jobs h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-draft {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-closed {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        @media (max-width: 768px) {
+            .jobs-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <a href="{{ url_for('company_dashboard') }}" class="logo">JobPortal</a>
+            
+            <nav class="nav-links">
+                <a href="{{ url_for('company_dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('company_jobs') }}" class="active">Jobs</a>
+                <a href="{{ url_for('company_profiles') }}">Candidates</a>
+                <a href="{{ url_for('edit_company_profile') }}">Settings</a>
+            </nav>
+            
+            <div class="user-menu">
+                {% if current_user.avatar %}
+                    <img src="{{ url_for('static', filename='uploads/' + current_user.avatar) }}" alt="User Avatar" class="avatar">
+                {% else %}
+                    <div class="avatar" style="background-color: #ccc; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-user" style="color: #666;"></i>
+                    </div>
+                {% endif %}
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        </div>
+    </header>
+    
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Job Listings</h1>
+                <a href="{{ url_for('create_job_offer') }}" class="btn">
+                    <i class="fas fa-plus"></i> Post New Job
+                </a>
+            </div>
+            
+            {% if jobs %}
+                <div class="jobs-container">
+                    {% for job in jobs %}
+                        <div class="job-card">
+                            <div class="job-header">
+                                <h2 class="job-title">{{ job.job_title }}</h2>
+                                <div class="job-meta">
+                                    <span><i class="fas fa-map-marker-alt"></i> {{ job.location }}</span>
+                                    <span><i class="fas fa-briefcase"></i> {{ job.job_type }}</span>
+                                </div>
+                                <span class="status-badge status-active">Active</span>
+                            </div>
+                            
+                            <div class="job-body">
+                                <p class="job-description">
+                                    {{ job.describe_position|truncate(200) }}
+                                </p>
+                                <p><strong>Salary:</strong> {{ job.salary_range }}</p>
+                            </div>
+                            
+                            <div class="job-footer">
+                                <small>Posted: {{ job.created_at.strftime('%b %d, %Y') }}</small>
+                                <div class="job-actions">
+                                    <a href="{{ url_for('job_applications', job_id=job.id) }}" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;">
+                                        <i class="fas fa-users"></i> View Applicants
+                                    </a>
+                                    <a href="#" class="btn" style="padding: 5px 10px; font-size: 12px;">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-jobs">
+                    <i class="fas fa-briefcase"></i>
+                    <h3>No Job Listings Yet</h3>
+                    <p>You haven't posted any job openings yet. Get started by posting your first job!</p>
+                    <a href="{{ url_for('create_job_offer') }}" class="btn" style="margin-top: 15px;">
+                        <i class="fas fa-plus"></i> Post a Job
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+</body>
+</html>

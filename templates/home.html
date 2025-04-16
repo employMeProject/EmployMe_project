@@ -7,23 +7,26 @@
     <title>Home - EmployMe</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
-        /* Добавленные стили для Swiper */
+        /* Общие стили */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* Стили для Swiper */
         .swiper {
             width: 100%;
             padding: 30px 0 50px;
         }
         
         .swiper-slide {
-            width: auto;
-            padding: 0 15px;
-        }
-        
-        .job-slide-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            padding: 10px;
+            width: 300px;
+            padding: 0 10px;
         }
         
         .swiper-button-next,
@@ -34,14 +37,16 @@
             height: 40px;
             border-radius: 50%;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            top: 40%;
         }
         
         .swiper-button-next::after,
         .swiper-button-prev::after {
             font-size: 20px;
+            font-weight: bold;
         }
         
-        /* Стили для карточек вакансий */
+        /* Карточки вакансий */
         .job-card {
             background: white;
             border-radius: 10px;
@@ -51,6 +56,7 @@
             height: 100%;
             display: flex;
             flex-direction: column;
+            border: 1px solid #eee;
         }
         
         .job-card:hover {
@@ -70,6 +76,11 @@
             font-size: 0.9rem;
         }
         
+        .job-card i {
+            margin-right: 5px;
+            color: #4e73df;
+        }
+        
         .apply-button {
             display: inline-block;
             margin-top: auto;
@@ -82,11 +93,234 @@
             transition: background-color 0.3s;
             align-self: flex-start;
             margin-top: 15px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
         }
         
         .apply-button:hover {
             background-color: #3a5ec0;
             color: white;
+        }
+        
+        /* Поисковая форма */
+        .search-form {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .search-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .search-button {
+            padding: 12px 25px;
+            background-color: #4e73df;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        
+        .search-button:hover {
+            background-color: #3a5ec0;
+        }
+        
+        /* Фильтры */
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px auto;
+            max-width: 1000px;
+            padding: 0 20px;
+        }
+        
+        .filter-button {
+            padding: 8px 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+        
+        .filter-button:hover, .filter-button.active {
+            background-color: #4e73df;
+            color: white;
+            border-color: #4e73df;
+        }
+        
+        /* Секция "Why Choose" */
+        .why-choose {
+            background-color: #f8f9fa;
+            padding: 60px 20px;
+            margin-top: 50px;
+        }
+        
+        .why-row {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .why-text h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 40px;
+            font-size: 2rem;
+        }
+        
+        .reasons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+        }
+        
+        .reason {
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+            max-width: 200px;
+        }
+        
+        .reason img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 15px;
+        }
+        
+        .reason p {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        /* Партнеры */
+        .partners-section {
+            padding: 60px 20px;
+            text-align: center;
+        }
+        
+        .partners-section h2 {
+            color: #2c3e50;
+            margin-bottom: 40px;
+            font-size: 2rem;
+        }
+        
+        .partners-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .partner-card {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            flex: 1;
+            min-width: 150px;
+            max-width: 200px;
+            height: 100px;
+        }
+        
+        .partner-card img {
+            max-width: 100%;
+            max-height: 60px;
+            object-fit: contain;
+            filter: grayscale(100%);
+            opacity: 0.7;
+            transition: all 0.3s;
+        }
+        
+        .partner-card:hover img {
+            filter: grayscale(0);
+            opacity: 1;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .swiper-slide {
+                width: 280px;
+            }
+            
+            .why-text h2, .partners-section h2 {
+                font-size: 1.5rem;
+            }
+            
+            .reason {
+                min-width: 120px;
+            }
+            
+            .reason img {
+                width: 60px;
+                height: 60px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .search-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .search-input, .search-button {
+                width: 100%;
+            }
+            
+            .swiper-slide {
+                width: 260px;
+            }
+            
+            .filter-tags {
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding-bottom: 10px;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .filter-button {
+                white-space: nowrap;
+            }
+            
+            .reason {
+                min-width: 100px;
+            }
+        }
+        
+        /* Сообщение "No results" */
+        .no-results {
+            text-align: center;
+            padding: 50px 20px;
+            color: #7f8c8d;
+            font-size: 1.2rem;
         }
     </style>
 </head>
@@ -97,14 +331,14 @@
     {% block title %}Home - EmployMe{% endblock %}
 
     {% block content %}
-    <h1 style="text-align: center; margin-top: 100px;">Start your job journey</h1>
+    <h1 style="text-align: center; margin-top: 30px; font-size: 2.2rem; color: #2c3e50;">Start your job journey</h1>
     <form class="search-form" action="{{ url_for('search_jobs_route') }}" method="GET">
         <div class="search-row">
             <input 
                 type="text" 
                 class="search-input" 
                 name="query"  
-                placeholder="Search"
+                placeholder="Job title, keywords"
                 aria-label="Job search"
                 value="{{ request.args.get('query', '') }}"
             >
@@ -112,7 +346,7 @@
                 type="text" 
                 class="search-input" 
                 name="location" 
-                placeholder="Location"
+                placeholder="City, country"
                 aria-label="Location"
                 value="{{ request.args.get('location', '') }}"
             >
@@ -120,9 +354,10 @@
         
         <button type="submit" class="search-button">Search</button>
     </form>
-    <form method="GET" action="{{ url_for('search_jobs_route') }}" id="filterForm" class="filterFormOval">
+    
+    <form method="GET" action="{{ url_for('search_jobs_route') }}" id="filterForm">
       <div class="filter-tags">
-        {% for t in ['Полная занятость','Частичная занятость','Пока нет Данных','Пока нет Данных','Пока нет Данных','Пока нет Данных','Пока нет Данных','Пока нет Данных','Пока нет Данных','Пока нет Данных'] %}
+        {% for t in ['Полная занятость', 'Частичная занятость', 'Remote', 'Contract', 'Internship', 'Temporary', 'Freelance', 'Flexible', 'On-site', 'Hybrid'] %}
           <button type="submit" name="job_type" value="{{ t }}" 
                   class="filter-button {% if request.args.get('job_type') == t %}active{% endif %}">
             {{ t }}
@@ -132,22 +367,23 @@
     </form>    
     <!-- Exclusive Offers Block: отображается, если нет поиска -->
       {% if not search_active %}
-      <section class="exclusive-offers">
-          <h1>Exclusive Offers</h1>
+      <section class="exclusive-offers" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+          <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">Exclusive Offers</h2>
           
-          <div class="job-cards-container">
+          <div class="job-cards-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
               {% for job in jobs %}
               <div class="job-card">
                   <h3 class="job-title">{{ job.job_title }}</h3>
-                  <p class="job-price">{{ job.salary_range }}</p>
-                  <p class="job-company">{{ job.company_name }}</p>
+                  <p class="job-price"><i class="bi bi-cash"></i> {{ job.salary_range }}</p>
+                  <p class="job-company"><i class="bi bi-building"></i> {{ job.company_name }}</p>
+                  <p class="job-location"><i class="bi bi-geo-alt"></i> {{ job.location }}</p>
                   
                   <div class="job-details">
                       {% if job.early_apply %}
-                          <span class="early-apply">(Early Apply)</span>
+                          <span class="early-apply" style="color: #28a745; font-size: 0.8rem;"><i class="bi bi-clock"></i> Early Apply</span>
                       {% endif %}
                       {% if job.multiple_candidates %}
-                          <span class="multiple-candidates">Multiple Candidates</span>
+                          <span class="multiple-candidates" style="color: #17a2b8; font-size: 0.8rem;"><i class="bi bi-people"></i> Multiple Candidates</span>
                       {% endif %}
                   </div>
                   <a href="{{ url_for('apply_for_job', job_id=job.id) }}" class="apply-button">Apply Now</a>
@@ -171,6 +407,7 @@
                 {% if job.get('salary_range') %}
                     <p><i class="bi bi-cash"></i> {{ job.salary_range }}</p>
                 {% endif %}
+                <p><i class="bi bi-building"></i> {{ job.company_name }}</p>
                 <a href="{{ url_for('apply_for_job', job_id=job.id) }}" class="apply-button">Apply Now</a>
               </div>
             </div>
@@ -193,24 +430,24 @@
           <div class="content-box">
             <div class="why-row">
               <div class="why-text">
-                <h2>So Why You Should Choose EmployMe ?</h2>
+                <h2>Why Choose EmployMe?</h2>
               </div>
               <div class="reasons">
                 <div class="reason">
                     <img src="{{ url_for('static', filename='images/why1.png') }}" alt="Community">
-                  <p>EmployMe community</p>
+                  <p>EmployMe Community</p>
                 </div>
                 <div class="reason">
                     <img src="{{ url_for('static', filename='images/why2.png') }}" alt="Opportunities">
-                  <p>Find job opportunities</p>
+                  <p>Find Job Opportunities</p>
                 </div>
                 <div class="reason">
                     <img src="{{ url_for('static', filename='images/why3.png') }}" alt="Clients">
-                  <p>Find perfect clients</p>
+                  <p>Find Perfect Clients</p>
                 </div>
                 <div class="reason">
                     <img src="{{ url_for('static', filename='images/why4.png') }}" alt="Income">
-                  <p>Fast income</p>
+                  <p>Fast Income</p>
                 </div>
               </div>
             </div>
@@ -222,22 +459,22 @@
         <h2>Our Partners</h2>
         <div class="partners-grid">
           <div class="partner-card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google" width="120">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
           </div>
           <div class="partner-card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft" width="120">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft">
           </div>
           <div class="partner-card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/9/96/Apple_logo_black.svg" alt="Apple" width="120">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/96/Apple_logo_black.svg" alt="Apple">
           </div>
           <div class="partner-card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon" width="120">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon">
           </div>
           <div class="partner-card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/01/LinkedIn_Logo.svg" alt="LinkedIn" width="120">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/01/LinkedIn_Logo.svg" alt="LinkedIn">
           </div>
           <div class="partner-card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Laravel.svg" alt="Laravel" width="120">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Laravel.svg" alt="Laravel">
           </div>
         </div>
       </section>
@@ -247,32 +484,36 @@
     
     <!-- Подключаем скрипты в конце body -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Инициализация Swiper
+            // Инициализация Swiper с правильными настройками
             const swiper = new Swiper('.swiper', {
                 slidesPerView: 'auto',
                 spaceBetween: 20,
                 centeredSlides: false,
                 loop: false,
+                grabCursor: true,
                 navigation: {
                     nextEl: '.swiper-button-next',
                     prevEl: '.swiper-button-prev',
                 },
                 breakpoints: {
-                    640: {
+                    320: {
                         slidesPerView: 1,
-                        spaceBetween: 20,
+                        spaceBetween: 10
                     },
-                    768: {
+                    640: {
                         slidesPerView: 2,
-                        spaceBetween: 30,
+                        spaceBetween: 15
                     },
                     1024: {
                         slidesPerView: 3,
-                        spaceBetween: 40,
+                        spaceBetween: 20
                     },
+                    1200: {
+                        slidesPerView: 4,
+                        spaceBetween: 25
+                    }
                 }
             });
             
@@ -285,6 +526,19 @@
                     }
                 });
             });
+            
+            // Адаптация фильтров для мобильных устройств
+            const filterTags = document.querySelector('.filter-tags');
+            if (filterTags && window.innerWidth < 768) {
+                filterTags.addEventListener('wheel', function(e) {
+                    if (e.deltaY > 0) {
+                        this.scrollLeft += 30;
+                    } else {
+                        this.scrollLeft -= 30;
+                    }
+                    e.preventDefault();
+                });
+            }
         });
     </script>
 </body>
