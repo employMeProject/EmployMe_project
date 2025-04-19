@@ -256,10 +256,10 @@
     {% include "_header.html" %}
     <div class="login-container" id="loginForm">
         <div class="logo">
-            <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Company Logo">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Company Logo" style = 'border-radius: 25px; border: 5px solid lightgreen ;'>
         </div>
         
-        <h1>Welcome back</h1>
+        <h1>Добро пожаловать</h1>
         
         {% if error %}
         <div class="error-message">{{ error }}</div>
@@ -267,39 +267,26 @@
         
         <form method="POST" action="{{ url_for('login') }}" id="loginFormElement">
             <div class="form-group">
-                <label for="username">Username or Email</label>
+                <label for="username">Имя пользователя </label>
                 <input type="text" id="username" name="username" class="form-control" required autofocus>
             </div>
             
             <div class="form-group">
-                <label for="password">Password</label>
+                <label for="password">Пароль</label>
                 <input type="password" id="password" name="password" class="form-control" required>
             </div>
             
             <button type="submit" class="btn" id="submitBtn">
                 <div class="spinner"></div>
-                <span>Sign In</span>
+                <span>Войти</span>
             </button>
         </form>
         
-        <div class="divider"><span>or</span></div>
+        <div class="divider"><span>или</span></div>
         
-        <div class="social-login">
-            <button type="button" class="social-btn">
-                <img src="{{ url_for('static', filename='images/google.svg') }}" alt="Google">
-            </button>
-            <button type="button" class="social-btn">
-                <img src="{{ url_for('static', filename='images/linkedin.svg') }}" alt="LinkedIn">
-            </button>
-            <button type="button" class="social-btn">
-                <img src="{{ url_for('static', filename='images/github.svg') }}" alt="GitHub">
-            </button>
-        </div>
-        <a href="{{ url_for('forgot_password') }}">Forgot password?</a>
-        
+
         <div class="footer-text">
-            Don't have an account? <a href="{{ url_for('register') }}">Sign up</a><br>
-            <a href="{{ url_for('forgot_password') }}">Forgot password?</a>
+            Нету аккаунта? <a href="{{ url_for('register') }}">Зарегестрироватся</a><br>
         </div>
     </div>
 

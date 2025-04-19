@@ -14,6 +14,12 @@ from flask_migrate import Migrate
 from datetime import datetime
 from sqlalchemy import text
 from flask_login import current_user
+from flask import g
+from flask import send_from_directory
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+
 app = Flask(__name__)
 
 
@@ -35,6 +41,8 @@ migrate = Migrate(app, db)
 app.config['UPLOAD_FOLDER'] = os.path.join(basedir, 'static/uploads')
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+RESUMES_UPLOAD_FOLDER = os.path.join(app.config['UPLOAD_FOLDER'], 'resumes')
+os.makedirs(RESUMES_UPLOAD_FOLDER, exist_ok=True)
 
 # Настройки Flask-Mail (замените на реальные)
 app.config['MAIL_SERVER'] = 'smtp.example.com'
@@ -44,12 +52,14 @@ app.config['MAIL_USERNAME'] = 'your-email@example.com'
 app.config['MAIL_PASSWORD'] = 'your-password'
 app.config['MAIL_DEFAULT_SENDER'] = 'your-email@example.com'
 
+admin_created = False 
 mail = Mail(app)
 
 # Инициализация Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
 class Company(db.Model):
     __tablename__ = 'companies'
     
@@ -204,7 +214,86 @@ def job_details(job_id):
     job = JobOffer.query.get_or_404(job_id)
     company = Company.query.get(job.company_id)
     return render_template('job_details.html', job=job, company=company)
-    
+@app.route('/fix-resume-paths')
+def fix_resume_paths():
+    resumes = Resume.query.all()
+    changed = 0
+
+    for resume in resumes:
+        original = resume.resume_path
+        if '\\' in original or '/' in original:
+            # Оставляем только имя файла
+            filename = os.path.basename(original)
+            resume.resume_path = filename
+            changed += 1
+
+    db.session.commit()
+    return f"✅ Обновлено {changed} резюме."
+@app.route('/fix-portfolio-paths')
+def fix_portfolio_paths():
+    resumes = Resume.query.all()
+    changed = 0
+
+    for resume in resumes:
+        if resume.portfolio_path:
+            original = resume.portfolio_path
+            if '\\' in original or '/' in original:
+                resume.portfolio_path = os.path.basename(original)
+                changed += 1
+
+    db.session.commit()
+    return f"✅ Обновлено {changed} портфолио."
+def recommend_jobs_by_profile(user_id, top_n=5):
+    user = User.query.get(user_id)
+    if not user:
+        return []
+
+    # Используем данные профиля
+    user_text = f"{user.desired_offer_title or ''} {user.skills or ''} {user.city or ''}"
+
+    all_jobs = JobOffer.query.all()
+    job_texts = [f"{job.job_title} {job.describe_position or ''} {job.location}" for job in all_jobs]
+
+    if not user_text.strip() or not job_texts:
+        return []
+
+    # TF-IDF + Cosine Similarity
+    corpus = [user_text] + job_texts
+    vectorizer = TfidfVectorizer()
+    tfidf = vectorizer.fit_transform(corpus)
+
+    similarities = cosine_similarity(tfidf[0:1], tfidf[1:]).flatten()
+    top_indices = similarities.argsort()[-top_n:][::-1]
+
+    return [all_jobs[i] for i in top_indices]
+
+
+@app.before_request
+def create_admin_if_needed():
+    global admin_created
+    if not admin_created:
+        admin = User.query.filter_by(username='admin').first()
+        if not admin:
+            admin = User(
+                username='admin',
+                password=generate_password_hash('admin123'),
+                email='admin@example.com',
+                first_name='Админ',
+                last_name='Системы'
+            )
+            db.session.add(admin)
+            db.session.commit()
+        admin_created = True
+@app.route('/admin')
+@login_required
+def custom_admin():
+    if current_user.username != 'admin':
+        return redirect(url_for('home'))
+
+    users = User.query.all()
+    return render_template('admin/custom_admin.html', users=users)
+# глобальная переменная
+
 @app.route('/apply/<int:job_id>', methods=['GET', 'POST'])
 @login_required
 def apply_for_job(job_id):
@@ -243,21 +332,28 @@ def apply_for_job(job_id):
                          company=job.company)
 
 @app.route('/application/<int:app_id>/update_status', methods=['POST'])
-@login_required
 def update_application_status(app_id):
-    if not current_user.is_authenticated:
-        return jsonify({'error': 'Not authorized'}), 403
-    
-    application = Application.query.get_or_404(app_id)
-    new_status = request.json.get('status')
-    
-    if new_status in ['under_review', 'accepted', 'rejected']:
+    if 'company_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+
+    data = request.get_json()
+    new_status = data.get('status')
+
+    if new_status not in ['under_review', 'accepted', 'rejected']:
+        return jsonify({'success': False, 'error': 'Invalid status'}), 400
+
+    try:
+        # Используем SQLAlchemy вместо sqlite3 вручную
+        application = Application.query.get_or_404(app_id)
         application.status = new_status
-        application.updated_at = datetime.utcnow()
         db.session.commit()
-        return jsonify({'success': True, 'new_status': new_status})
-    
-    return jsonify({'error': 'Invalid status'}), 400
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 # Маршруты для восстановления пароля
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
@@ -302,7 +398,8 @@ def reset_password(token):
 @app.route('/profile')
 @login_required
 def profile():
-    return render_template('profile.html')
+    recommended_jobs = recommend_jobs_by_profile(current_user.id)
+    return render_template('profile.html', recommended_jobs=recommended_jobs)
 # Загрузчик пользователя
 @login_manager.user_loader
 def load_user(user_id):
@@ -352,17 +449,65 @@ def search_jobs_route():
     location = request.args.get('location', '').strip()
     job_type = request.args.get('job_type', '').strip()
     
-    is_search = any([query, location, job_type])  # True если есть хоть один параметр
+    is_search = any([query, location, job_type])
     jobs = search_jobs(query=query, location=location, job_type=job_type)
+
+    # Загружаем партнёров
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT name, website FROM companies ORDER BY created_at DESC LIMIT 10")
+    partners = cursor.fetchall()
+    conn.close()
     
     return render_template('home.html', 
-                         jobs=jobs, 
-                         search_active=is_search,
-                         selected_type=job_type)
+                           jobs=jobs, 
+                           search_active=is_search,
+                           selected_type=job_type,
+                           partners=partners)
+
+
+
+@app.route('/modal-content/<string:section>')
+def modal_content(section):
+    allowed = {
+        'about': 'modals/about.html',
+        'privacy': 'modals/privacy.html',
+        'terms': 'modals/terms.html',
+        'contact': 'modals/contact.html'
+    }
+
+    template = allowed.get(section)
+    if not template:
+        return "Ничего не найдено", 404
+
+    return render_template(template)
 
 @app.route('/')
 def home():
-    return render_template('home.html', search_active=False)
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Загружаем последних 10 вакансий
+    cursor.execute("""
+        SELECT job_offers.*, companies.name as company_name
+        FROM job_offers
+        JOIN companies ON job_offers.company_id = companies.id
+        ORDER BY job_offers.id DESC
+        LIMIT 10
+    """)
+    jobs = cursor.fetchall()
+
+    cursor.execute("SELECT name, website FROM companies ORDER BY created_at DESC LIMIT 10")
+    partners = cursor.fetchall()
+    
+    conn.close()
+    
+    return render_template('home.html', 
+                           partners=partners, 
+                           jobs=jobs, 
+                           search_active=False)
+
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -498,6 +643,7 @@ def register_step_4():
             flash('Registration failed. Please try again.', 'error')
             return redirect(url_for('register_step_1'))
 @app.route('/resume', methods=['GET', 'POST'])
+@login_required
 def resume():
     if request.method == 'POST':
         name = request.form['name']
@@ -505,7 +651,6 @@ def resume():
         email = request.form['email']
         phone = request.form['phone_number']
         cover_letter = request.form.get('cover_letter')
-        user_id = 1  # или из session['user_id']
 
         resume = request.files['resume']
         portfolio = request.files['portfolio']
@@ -513,11 +658,11 @@ def resume():
         resume_filename = secure_filename(resume.filename)
         portfolio_filename = secure_filename(portfolio.filename)
 
-        resume_path = os.path.join('uploads/resume', resume_filename)
-        portfolio_path = os.path.join('uploads/portfolio', portfolio_filename)
-
-        resume.save(resume_path)
-        portfolio.save(portfolio_path)
+        # Сохраняем файлы в правильные места
+        resume.save(os.path.join(RESUMES_UPLOAD_FOLDER, resume_filename))
+        portfolio_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'portfolio')
+        os.makedirs(portfolio_folder, exist_ok=True)
+        portfolio.save(os.path.join(portfolio_folder, portfolio_filename))
 
         with sqlite3.connect("mydatabase.db") as conn:
             cur = conn.cursor()
@@ -529,14 +674,16 @@ def resume():
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
                 name, last_name, email, phone,
-                resume_path, portfolio_path, cover_letter,
-                user_id
+                resume_filename, portfolio_filename, cover_letter,
+                current_user.id  # Используем правильного пользователя
             ))
             conn.commit()
 
-        return redirect(url_for('success'))
+        flash("Резюме успешно загружено", "success")
+        return redirect(url_for('profile'))
 
     return render_template('resume_form.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -545,21 +692,86 @@ def login():
         password = request.form['password']
         
         user = User.query.filter_by(username=username).first()
-        
-        # Отладочная информация
-        print(f"User found: {user}")
-        if user:
-            print(f"Password check: {check_password_hash(user.password, password)}")
-            print(f"Stored hash: {user.password}")
-            print(f"Input password: {password}")
-        
+
         if user and check_password_hash(user.password, password):
             login_user(user)
+            if user.username == 'admin':
+                return redirect(url_for('custom_admin'))  # <- Перенаправление на /admin
             return redirect(url_for('profile'))
-        
-        return render_template('login.html', error="Invalid credentials")
-    
+
+        return render_template('login.html', error="Неверные учетные данные")
+
     return render_template('login.html')
+
+@app.route('/admin/user/<int:user_id>/delete', methods=['POST'])
+@login_required
+def delete_user(user_id):
+    if current_user.username != 'admin':
+        return jsonify({'success': False, 'error': 'Access denied'}), 403
+    
+    user = User.query.get_or_404(user_id)
+    
+    try:
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/admin/company/<int:company_id>/delete', methods=['POST'])
+@login_required
+def delete_company(company_id):
+    if current_user.username != 'admin':
+        return jsonify({'success': False, 'error': 'Access denied'}), 403
+
+    company = Company.query.get_or_404(company_id)
+    
+    try:
+        db.session.delete(company)
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)})
+@app.route('/admin/users')
+@login_required
+def admin_users():
+    if current_user.username != 'admin':
+        return redirect(url_for('home'))
+    users = User.query.all()
+    return render_template('admin/users.html', users=users)
+
+@app.route('/admin/companies')
+@login_required
+def admin_companies():
+    if current_user.username != 'admin':
+        return redirect(url_for('home'))
+    companies = Company.query.all()
+    return render_template('admin/companies.html', companies=companies)
+
+@app.route('/admin/jobs')
+@login_required
+def admin_jobs():
+    if current_user.username != 'admin':
+        return redirect(url_for('home'))
+    jobs = JobOffer.query.all()
+    return render_template('admin/jobs.html', jobs=jobs)
+@app.route('/admin/job/<int:job_id>/delete', methods=['POST'])
+@login_required
+def delete_job(job_id):
+    if current_user.username != 'admin':
+        return jsonify({'success': False, 'error': 'Access denied'}), 403
+
+    job = JobOffer.query.get_or_404(job_id)
+    try:
+        db.session.delete(job)
+        db.session.commit()
+        return redirect(url_for('admin_jobs'))
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)})
+
 
 @app.route('/logout')
 @login_required
@@ -688,8 +900,10 @@ def company_login():
             if check_password_hash(company['password'], password):
                 session['company_id'] = company['id']
                 session['company_name'] = company['name']
+                session['company_username'] = company['username']  # <--- ЭТО
                 session['is_company'] = True
                 return redirect(url_for('company_dashboard'))
+
             else:
                 flash("Неверный пароль", "error")
         else:
@@ -722,8 +936,18 @@ def company_dashboard():
     jobs = cursor.fetchall()
 
     # Заявки
+# Получаем заявки + имя соискателя + название вакансии
     cursor.execute("""
-        SELECT a.* FROM applications a
+        SELECT 
+            a.id,
+            a.status,
+            a.created_at,
+            a.resume_id,
+            u.first_name,
+            u.last_name,
+            j.job_title
+        FROM applications a
+        JOIN users u ON a.user_id = u.id
         JOIN job_offers j ON a.job_offer_id = j.id
         WHERE j.company_id = ?
         ORDER BY a.created_at DESC
@@ -731,12 +955,15 @@ def company_dashboard():
     """, (company['id'],))
     applications = cursor.fetchall()
 
+
+
     conn.close()
 
     return render_template('company/dashboard.html',
                            company=company,
                            jobs=jobs,
                            applications=applications)
+
 @app.route('/company/jobs')
 def company_jobs():
     # Проверяем, залогинена ли компания
@@ -818,35 +1045,81 @@ def edit_company_profile():
     
     return render_template('company/edit_profile.html', company=company)
 
+DATABASE = 'mydatabase.db'
+
+def get_db():
+    if 'db' not in g:
+        g.db = sqlite3.connect(DATABASE)
+        g.db.row_factory = sqlite3.Row
+    return g.db
+
+@app.teardown_appcontext
+def close_db(error):
+    db = g.pop('db', None)
+    if db is not None:
+        db.close()
 
 @app.route('/company/create_job_offer', methods=['GET', 'POST'])
 def create_job_offer():
-    # Ищем компанию по почте текущего пользователя
-    company = Company.query.filter_by(contact_email=current_user.email).first()
-    if not company:
-        flash('Сначала зарегистрируйте компанию', 'warning')
-        return redirect(url_for('register_company'))
+    # Получаем подключение к базе данных
+    db = get_db()
 
     if request.method == 'POST':
         try:
-            job = JobOffer(
-                job_title=request.form.get('job_title'),
-                location=request.form.get('location'),
-                job_type=request.form.get('job_type'),
-                describe_position=request.form.get('description'),
-                salary_range=request.form.get('salary_range'),
-                company_id=company.id
-            )
-            db.session.add(job)
-            db.session.commit()
-            flash('Вакансия успешно создана!', 'success')
-            return redirect(url_for('company_profile'))
+            # Проверяем, что все необходимые данные есть
+            job_title = request.form.get('job_title')
+            location = request.form.get('location')
+            category = request.form.get('category')
+            job_type = request.form.get('job_type')
+            describe_position = request.form.get('description')
+            salary_range = request.form.get('salary_range')
+            unique_journey = request.form.get('unique_journey')
+            employee_expectations = request.form.get('employee_expectations')
+            employee_contribution = request.form.get('employee_contribution')
+            team_description = request.form.get('team_description')
+            interview_process = request.form.get('interview_process')
+            benefits = request.form.get('benefits')
+            payment_frequency = request.form.get('payment_frequency')
+
+            # Проверка обязательных полей
+            if not job_title or not location:
+                flash('Название вакансии и местоположение обязательны для заполнения', 'error')
+                return redirect(url_for('create_job_offer'))
+
+            # Запрос для получения компании по username
+            cur = db.execute('SELECT * FROM companies WHERE username = ?', (session.get('company_username'),))
+            company = cur.fetchone()
+
+            if not company:
+                flash('Компания не найдена. Пожалуйста, войдите в свой аккаунт компании.', 'error')
+                return redirect(url_for('company_login'))
+
+            # Создание вакансии в базе данных
+            db.execute('''
+                INSERT INTO job_offers 
+                (job_title, location, category, job_type, describe_position, 
+                 unique_journey, employee_expectations, employee_contribution, 
+                 team_description, interview_process, salary_range, benefits, 
+                 payment_frequency, company_id) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (job_title, location, category, job_type, describe_position,
+                  unique_journey, employee_expectations, employee_contribution,
+                  team_description, interview_process, salary_range, benefits,
+                  payment_frequency, company['id']))
+
+            # Сохранение изменений
+            db.commit()
+
+            flash('Вакансия успешно добавлена!', 'success')
+            return redirect(url_for('company_dashboard'))
+
         except Exception as e:
-            db.session.rollback()
-            flash('Ошибка при создании вакансии', 'error')
-            print(f'Ошибка: {e}')  # Для отладки, можно убрать
+            db.rollback()  # Откатить изменения в случае ошибки
+            flash(f'Ошибка при добавлении вакансии: {str(e)}', 'error')
+            print(f'Ошибка: {e}')  # Логирование ошибки для отладки
 
     return render_template('company/create_job_offer.html')
+
 
 @app.route('/company/job/<int:job_id>/applications')
 @login_required
@@ -997,40 +1270,59 @@ def upload_avatar():
 # Добавьте в начало файла
 RESUMES_UPLOAD_FOLDER = os.path.join(app.config['UPLOAD_FOLDER'], 'resumes')
 os.makedirs(RESUMES_UPLOAD_FOLDER, exist_ok=True)
+@app.route('/debug-resume-file')
+def debug_resume_file():
+    path = os.path.join(RESUMES_UPLOAD_FOLDER, "Data_description.pdf")
+    exists = os.path.exists(path)
+    return f"Path: {path}<br>Exists: {exists}"
 
 # Обновите функцию upload_resume
 @app.route('/upload-resume', methods=['POST'])
 @login_required
 def upload_resume():
+    print("🟡 upload_resume called")
+
     if 'resume' not in request.files:
+        print("❌ No file in request")
         return jsonify({'success': False, 'error': 'No file uploaded'})
     
     file = request.files['resume']
+    print(f"📄 Received file: {file.filename}")
+
     if file.filename == '':
+        print("❌ No filename provided")
         return jsonify({'success': False, 'error': 'No selected file'})
     
     allowed_extensions = {'pdf', 'doc', 'docx'}
     ext = file.filename.split('.')[-1].lower()
-    
+    print(f"📄 File extension: {ext}")
+
     if ext not in allowed_extensions:
+        print("❌ Invalid extension")
         return jsonify({'success': False, 'error': 'Invalid file type. Allowed: PDF, DOC, DOCX'})
-    
+
     try:
-        # Генерируем уникальное имя файла
         filename = f'resume_{current_user.id}_{int(time.time())}.{ext}'
         filepath = os.path.join(RESUMES_UPLOAD_FOLDER, filename)
-        
+        print(f"📂 Saving to: {filepath}")
+
         file.save(filepath)
-        
-        # Создаем запись о резюме
+        print("✅ File saved")
+
+        # Создание записи — проверь, что все поля обязательные присутствуют!
         new_resume = Resume(
             name=f"Резюме {datetime.now().strftime('%d.%m.%Y')}",
-            resume_path=filename,  # Сохраняем только имя файла
+            last_name=current_user.last_name or 'Имя',
+            email=current_user.email,
+            phone_number=current_user.phone_number,
+            resume_path=filename,
             user_id=current_user.id
         )
+
         db.session.add(new_resume)
         db.session.commit()
-        
+        print("✅ Resume added to database")
+
         return jsonify({
             'success': True,
             'resume': {
@@ -1040,23 +1332,36 @@ def upload_resume():
                 'download_url': url_for('download_resume', resume_id=new_resume.id)
             }
         })
+
     except Exception as e:
+        print("❌ Ошибка при загрузке резюме:", e)
         return jsonify({'success': False, 'error': str(e)})
+
 
 # Добавьте новый маршрут для скачивания резюме
 @app.route('/download-resume/<int:resume_id>')
 @login_required
 def download_resume(resume_id):
     resume = Resume.query.get_or_404(resume_id)
+
     if resume.user_id != current_user.id:
         abort(403)
-    
+
+    full_resume_dir = RESUMES_UPLOAD_FOLDER
+    filename = resume.resume_path
+
+    print("📂 Sending from:", full_resume_dir)
+    print("📄 File:", filename)
+    print("📎 Path exists:", os.path.exists(os.path.join(full_resume_dir, filename)))
+
     return send_from_directory(
-        RESUMES_UPLOAD_FOLDER,
-        resume.resume_path,
+        directory=full_resume_dir,
+        path=filename,
         as_attachment=True,
-        download_name=f"resume_{resume.id}.{resume.resume_path.split('.')[-1]}"
-    )   
+        download_name=filename
+    )
+
+  
 
 # Удаление резюме
 @app.route('/delete-resume/<int:resume_id>', methods=['DELETE'])
@@ -1069,7 +1374,8 @@ def delete_resume(resume_id):
     
     try:
         # Удаляем файл
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], resume.resume_path)
+        filepath = os.path.join(RESUMES_UPLOAD_FOLDER, resume.resume_path)
+
         if os.path.exists(filepath):
             os.remove(filepath)
         

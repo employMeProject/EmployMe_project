@@ -9,53 +9,35 @@
         :root {
             --primary-color: #4361ee;
             --secondary-color: #3f37c9;
-            --accent-color: #4895ef;
             --light-color: #f8f9fa;
             --dark-color: #212529;
-            --success-color: #4cc9f0;
-            --warning-color: #f8961e;
-            --danger-color: #f72585;
             --border-radius: 8px;
             --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
         }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
+
         body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f5f7fa;
             color: var(--dark-color);
-            line-height: 1.6;
-            padding: 0;
             margin: 0;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
-        
-        /* Header Styles */
+
         .company-header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             padding: 40px 20px;
             border-radius: var(--border-radius);
-            margin-bottom: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             text-align: center;
-            position: relative;
-            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
         }
-        
+
         .company-logo {
             width: 120px;
             height: 120px;
@@ -63,239 +45,270 @@
             object-fit: cover;
             border: 4px solid white;
             margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
-        
-        .company-header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-        
-        .company-header p {
-            max-width: 800px;
-            font-size: 1.1rem;
-            margin-bottom: 25px;
-            opacity: 0.9;
-        }
-        
+
         .btn {
-            display: inline-block;
-            background-color: white;
-            color: var(--primary-color);
-            padding: 12px 25px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: var(--transition);
+            background-color: var(--primary-color);
+            color: white;
             border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
             cursor: pointer;
-            font-size: 1rem;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-weight: bold;
+            text-decoration: none;
+            transition: var(--transition);
         }
-        
+
         .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            background-color: var(--light-color);
+            background-color: var(--secondary-color);
         }
-        
-        /* Stats Section */
+
         .company-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
         }
-        
+
         .stat-card {
             background: white;
-            padding: 25px;
+            padding: 20px;
             border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
             text-align: center;
-            transition: var(--transition);
+            box-shadow: var(--box-shadow);
         }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .stat-card h3 {
-            color: var(--primary-color);
-            margin-bottom: 10px;
-            font-size: 1.2rem;
-        }
-        
-        .stat-card p {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--dark-color);
-        }
-        
-        /* Applications Section */
+
         .recent-applications {
             background: white;
             padding: 30px;
             border-radius: var(--border-radius);
-            margin-bottom: 30px;
             box-shadow: var(--box-shadow);
+            margin-bottom: 40px;
         }
-        
+
         .recent-applications h2 {
-            color: var(--primary-color);
             margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #eee;
-            font-size: 1.8rem;
+            text-align: center;
+            color: var(--primary-color);
         }
-        
-        .recent-applications ul {
-            list-style: none;
-        }
-        
-        .recent-applications li {
-            padding: 15px 0;
-            border-bottom: 1px solid #eee;
+
+        .application-item {
+            border: 1px solid #eee;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-        
-        .recent-applications li:last-child {
-            border-bottom: none;
-        }
-        
-        .recent-applications li a {
-            color: var(--dark-color);
-            text-decoration: none;
-            font-weight: 500;
-            transition: var(--transition);
-            flex-grow: 1;
-        }
-        
-        .recent-applications li a:hover {
-            color: var(--primary-color);
-            text-decoration: underline;
-        }
-        
-        .status-badge {
-            padding: 5px 15px;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            margin-left: 15px;
-        }
-        
-        .status-badge.pending {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-        
-        .status-badge.accepted {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        
-        .status-badge.rejected {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        
-        .status-badge.reviewed {
-            background-color: #cce5ff;
-            color: #004085;
-        }
-        
-        /* Actions Section */
-        .company-actions {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
             flex-wrap: wrap;
         }
-        
+
+        .application-item a {
+            text-decoration: none;
+            color: var(--dark-color);
+            font-weight: 500;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            background-color: #eee;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .company-actions {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
         .company-actions .btn {
+            margin: 10px;
+        }
+        header {
+            background-color: white;
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 24px;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-color);
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
             background-color: var(--primary-color);
-            color: white;
         }
-        
-        .company-actions .btn:hover {
-            background-color: var(--secondary-color);
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
-        
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .company-header h1 {
-                font-size: 2rem;
-            }
-            
-            .company-header p {
-                font-size: 1rem;
-            }
-            
-            .company-actions {
-                flex-direction: column;
-            }
-            
-            .company-actions .btn {
-                width: 100%;
-                text-align: center;
-            }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .main-content {
+            padding: 40px 0;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="company-header">
-            {% if company.photo %}
-            <img src="{{ url_for('static', filename='uploads/' + company.photo) }}" alt="{{ company.name }}" class="company-logo">
-            {% else %}
-            <div class="company-logo" style="background-color: #ddd; display: flex; align-items: center; justify-content: center;">
-                <span style="font-size: 2rem; color: #666;">{{ company.name|first|upper }}</span>
-            </div>
-            {% endif %}
-            <h1>{{ company.name }}</h1>
-            <p>{{ company.about }}</p>
-            <a href="{{ url_for('edit_company_profile') }}" class="btn">Редактировать профиль</a>
-        </div>
-        
-        <div class="company-stats">
-            <div class="stat-card">
-                <h3>Активные вакансии</h3>
-                <p>{{ jobs|length }}</p>
-            </div>
+
+<div class="container">
+    <header>
+        <div class="container header-container">
+            <a href="{{ url_for('company_dashboard') }}" class="logo">JobPortal</a>
             
-            <div class="stat-card">
-                <h3>Всего заявок</h3>
-                <p>{{ applications|length }}</p>
+            <nav class="nav-links">
+                <a href="{{ url_for('company_dashboard') }}" class="active">Dashboard</a>
+                <a href="{{ url_for('company_jobs') }}" >Jobs</a>
+            </nav>
+            
+            <div class="user-menu">
+                {% if current_user.avatar %}
+                    <img src="{{ url_for('static', filename='uploads/' + current_user.avatar) }}" alt="User Avatar" class="avatar">
+                {% else %}
+                    <div class="avatar" style="background-color: #ccc; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-user" style="color: #666;"></i>
+                    </div>
+                {% endif %}
+                <a href="{{ url_for('logout') }}">Logout</a>
             </div>
         </div>
-        
-        <div class="recent-applications">
-            <h2>Последние заявки</h2>
-            {% if applications %}
-            <ul>
-                {% for app in applications %}
-                <li>
-                    <a href="{{ url_for('view_application', app_id=app.id) }}">
-                        {{ app.applicant.first_name }} {{ app.applicant.last_name }} - {{ app.job_offer.job_title }}
-                    </a>
-                    <span class="status-badge {{ app.status }}">{{ app.status }}</span>
-                </li>
-                {% endfor %}
-            </ul>
-            {% else %}
-            <p style="text-align: center; color: #666; padding: 20px 0;">Пока нет заявок</p>
-            {% endif %}
+    </header>
+    <!-- Профиль -->
+    <div class="company-header">
+        {% if company['photo'] %}
+            <img src="{{ url_for('static', filename='uploads/' + company['photo']) }}" alt="Logo" class="company-logo">
+        {% endif %}
+        <h1>{{ company['name'] }}</h1>
+        <p>{{ company['about'] }}</p>
+    </div>
+
+    <!-- Статистика -->
+    <div class="company-stats">
+        <div class="stat-card">
+            <h3>Активные вакансии</h3>
+            <p>{{ jobs|length }}</p>
         </div>
-        
-        <div class="company-actions">
-            <a href="{{ url_for('create_job_offer') }}" class="btn">Создать вакансию</a>
-            <a href="{{ url_for('company_jobs') }}" class="btn">Все вакансии</a>
+        <div class="stat-card">
+            <h3>Всего заявок</h3>
+            <p>{{ applications|length }}</p>
         </div>
     </div>
+
+    <!-- Заявки -->
+    <div class="recent-applications">
+        <h2>Последние заявки</h2>
+        {% if applications %}
+            <ul style="list-style: none; padding: 0;">
+                {% for app in applications %}
+                    <li class="application-item">
+                        <div style="flex: 1 1 auto;">
+                            <a href="{{ url_for('view_application', app_id=app['id']) }}">
+                                {{ app['first_name'] }} {{ app['last_name'] }} — {{ app['job_title'] }}
+                            </a>
+                            <div style="margin-top: 8px;">
+                                <a href="{{ url_for('download_resume', resume_id=app['resume_id']) }}" class="btn">📄 Скачать резюме</a>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="status-badge {{ app['status'] }}">{{ app['status'] }}</span>
+                            <button class="btn" onclick="updateStatus({{ app['id'] }}, 'accepted')">✅</button>
+                            <button class="btn" onclick="updateStatus({{ app['id'] }}, 'rejected')">❌</button>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p style="text-align: center; color: #888;">Пока нет заявок</p>
+        {% endif %}
+    </div>
+
+    <!-- Действия -->
+    <div class="company-actions">
+        <a href="{{ url_for('create_job_offer') }}" class="btn">Создать вакансию</a>
+        <a href="{{ url_for('company_jobs') }}" class="btn">Все вакансии</a>
+    </div>
+
+</div>
+
+<script>
+    function updateStatus(appId, newStatus) {
+        fetch(`/application/${appId}/update_status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: newStatus })
+        })
+        .then(response => {
+            console.log("Ответ от сервера:", response);  // 👈 ВСТАВЛЕНО ВОТ ЭТО
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Ошибка: ' + (data.error || 'Не удалось обновить статус.'));
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Ошибка при обновлении');
+        });
+    }
+</script>
+
+
 </body>
 </html>

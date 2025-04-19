@@ -4,78 +4,151 @@
     <meta charset="UTF-8">
     <title>Создание вакансии | Business Portal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #4361ee;
-            --secondary: #4895ef;
-            --bg: #f8f9fa;
-            --white: #ffffff;
-            --text: #212529;
-            --shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-            --border-radius: 10px;
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --secondary: #10B981;
+            --bg: #F9FAFB;
+            --white: #FFFFFF;
+            --text: #111827;
+            --text-light: #6B7280;
+            --border: #E5E7EB;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 8px;
+            --radius-lg: 12px;
+            --transition: all 0.2s ease;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg);
             margin: 0;
             padding: 0;
             color: var(--text);
+            line-height: 1.5;
         }
 
         .container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 40px auto;
-            padding: 30px;
+            padding: 0 20px;
+        }
+
+        .card {
             background-color: var(--white);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 40px;
+            margin-bottom: 20px;
+            transition: var(--transition);
         }
 
         h1 {
             text-align: center;
-            margin-bottom: 30px;
+            margin: 0 0 30px 0;
             color: var(--primary);
+            font-weight: 700;
+            font-size: 28px;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-header p {
+            color: var(--text-light);
+            margin-top: 8px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
         }
 
         form label {
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        form label.required:after {
+            content: " *";
+            color: #EF4444;
         }
 
         form input,
         form textarea,
         form select {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #ced4da;
-            border-radius: var(--border-radius);
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             font-size: 15px;
-            background-color: #fefefe;
+            background-color: var(--white);
+            transition: var(--transition);
+        }
+
+        form input:focus,
+        form textarea:focus,
+        form select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
 
         form textarea {
             resize: vertical;
-            min-height: 100px;
+            min-height: 120px;
         }
 
-        button {
-            width: 100%;
-            padding: 12px;
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
             background-color: var(--primary);
             border: none;
             color: white;
             font-size: 16px;
-            font-weight: bold;
-            border-radius: var(--border-radius);
+            font-weight: 600;
+            border-radius: var(--radius);
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: var(--transition);
+            width: 100%;
         }
 
-        button:hover {
-            background-color: var(--secondary);
+        .btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn i {
+            margin-right: 8px;
         }
 
         .back-link {
@@ -87,49 +160,257 @@
             color: var(--primary);
             text-decoration: none;
             font-weight: 500;
+            display: inline-flex;
+            align-items: center;
         }
 
         .back-link a:hover {
             text-decoration: underline;
         }
 
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
+        .back-link i {
+            margin-right: 6px;
+        }
+
+        .alert {
+            padding: 16px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-info {
+            background-color: #EFF6FF;
+            color: #1E40AF;
+            border-left: 4px solid #3B82F6;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section-title {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+
+        .form-section-title i {
+            margin-right: 10px;
+        }
+
+        .character-counter {
+            font-size: 12px;
+            color: var(--text-light);
+            text-align: right;
+            margin-top: -15px;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            
+            .card {
+                padding: 30px 20px;
             }
         }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .form-group {
+            animation: fadeIn 0.4s ease-out forwards;
+            animation-delay: calc(var(--order) * 0.05s);
+        }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <h1>Создание вакансии</h1>
-        <form method="POST">
-            <label for="job_title">Название должности</label>
-            <input type="text" name="job_title" id="job_title" required>
-
-            <label for="location">Местоположение</label>
-            <input type="text" name="location" id="location" required>
-
-            <label for="job_type">Тип занятости</label>
-            <select name="job_type" id="job_type" required>
-                <option value="Полная занятость">Полная занятость</option>
-                <option value="Частичная занятость">Частичная занятость</option>
-                <option value="Удалённая работа">Удалённая работа</option>
-                <option value="Стажировка">Стажировка</option>
-            </select>
-
-            <label for="salary_range">Зарплата</label>
-            <input type="text" name="salary_range" id="salary_range" placeholder="Например: от 40 000 до 60 000 сом">
-
-            <label for="description">Описание</label>
-            <textarea name="description" id="description" required></textarea>
-
-            <button type="submit">Создать вакансию</button>
-        </form>
-
+        <div class="card">
+            <div class="form-header">
+                <h1><i class="fas fa-briefcase"></i> Создать вакансию</h1>
+                <p>Заполните все необходимые поля для публикации вакансии</p>
+            </div>
+            
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-grid">
+                    <!-- Основная информация -->
+                    <div class="form-section full-width">
+                        <div class="form-section-title"><i class="fas fa-info-circle"></i> Основная информация</div>
+                        <div class="form-group" style="--order: 1">
+                            <label for="job_title" class="required">Название вакансии</label>
+                            <input type="text" id="job_title" name="job_title" required placeholder="Например: Официант">
+                        </div>
+                    
+                        <div class="form-group" style="--order: 2">
+                            <label for="location" class="required">Местоположение</label>
+                            <input type="text" id="location" name="location" required placeholder="Например: Бишкек, офис или удалённо">
+                        </div>
+                    
+                        <div class="form-group" style="--order: 3">
+                            <label for="category">Категория</label>
+                            <select id="category" name="category">
+                                <option value="">Выберите категорию</option>
+                                <option value="IT">Для мужчин</option>
+                                <option value="marketing">Для женщин</option>
+                                <option value="sales">Для подростков</option>
+                                <option value="finance">Для пенсионеров</option>
+                            </select>
+                        </div>
+                    
+                        <div class="form-group" style="--order: 4">
+                            <label for="job_type">Тип работы</label>
+                            <select id="job_type" name="job_type">
+                                <option value="">Выберите тип работы</option>
+                                <option value="fulltime"> Утренняя смена</option>
+                                <option value="parttime">Вечерняя смена</option>
+                                <option value="remote">Разовая</option>
+                                <option value="hybrid">Ночная</option>
+                                <option value="project">На несколько часов в день</option>
+                            </select>
+                        </div>
+                    
+                        <div class="form-group" style="--order: 5">
+                            <label for="salary_range">Диапазон зарплаты</label>
+                            <input type="text" id="salary_range" name="salary_range" placeholder="Например: от 10 000 до 30 000 руб.">
+                        </div>
+                    
+                        <div class="form-group" style="--order: 6">
+                            <label for="payment_frequency">Частота выплат</label>
+                            <select id="payment_frequency" name="payment_frequency">
+                                <option value="project_based">По завершению проекта</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Описание вакансии -->
+                    <div class="form-section full-width">
+                        <div class="form-section-title"><i class="fas fa-align-left"></i> Описание вакансии</div>
+                        <div class="form-group" style="--order: 7">
+                            <label for="description" class="required">Описание вакансии</label>
+                            <textarea id="description" name="description" rows="4" required placeholder="Подробно опишите вакансию, обязанности и требования"></textarea>
+                            <div class="character-counter"><span id="description-counter">0</span>/2000 символов</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Детали вакансии -->
+                    <div class="form-section full-width">
+                        <div class="form-section-title"><i class="fas fa-star"></i> Детали вакансии</div>
+                        <div class="form-group" style="--order: 8">
+                            <label for="unique_journey">Уникальное предложение для сотрудника</label>
+                            <textarea id="unique_journey" name="unique_journey" rows="3" placeholder="Что делает эту вакансию особенной?"></textarea>
+                            <div class="character-counter"><span id="journey-counter">0</span>/1000 символов</div>
+                        </div>
+                    
+                        <div class="form-group" style="--order: 9">
+                            <label for="employee_expectations">Ожидания от сотрудника</label>
+                            <textarea id="employee_expectations" name="employee_expectations" rows="3" placeholder="Какие навыки и качества вы ищете?"></textarea>
+                            <div class="character-counter"><span id="expectations-counter">0</span>/1000 символов</div>
+                        </div>
+                    
+                        <div class="form-group" style="--order: 10">
+                            <label for="employee_contribution">Вклад сотрудника в компанию</label>
+                            <textarea id="employee_contribution" name="employee_contribution" rows="3" placeholder="Как сотрудник сможет повлиять на компанию?"></textarea>
+                            <div class="character-counter"><span id="contribution-counter">0</span>/1000 символов</div>
+                        </div>
+                    
+                        <div class="form-group" style="--order: 11">
+                            <label for="team_description">Описание команды</label>
+                            <textarea id="team_description" name="team_description" rows="3" placeholder="С кем будет работать сотрудник?"></textarea>
+                            <div class="character-counter"><span id="team-counter">0</span>/1000 символов</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Процесс найма -->
+                    <div class="form-section full-width">
+                        <div class="form-section-title"><i class="fas fa-clipboard-list"></i> Процесс найма</div>
+                        <div class="form-group" style="--order: 12">
+                            <label for="interview_process">Процесс собеседования</label>
+                            <textarea id="interview_process" name="interview_process" rows="3" placeholder="Опишите этапы собеседования"></textarea>
+                            <div class="character-counter"><span id="interview-counter">0</span>/1000 символов</div>
+                        </div>
+                    
+                        <div class="form-group" style="--order: 13">
+                            <label for="benefits">Преимущества</label>
+                            <textarea id="benefits" name="benefits" rows="3" placeholder="Какие бонусы и льготы вы предлагаете?"></textarea>
+                            <div class="character-counter"><span id="benefits-counter">0</span>/1000 символов</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn"><i class="fas fa-paper-plane"></i> Опубликовать вакансию</button>
+            </form>
+            
+            {% if get_flashed_messages() %}
+                <div class="alert alert-info mt-3">
+                    {% for message in get_flashed_messages() %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
         <div class="back-link">
-            <a href="{{ url_for('company_profile') }}">← Вернуться в профиль компании</a>
+            <a href="#"><i class="fas fa-arrow-left"></i> Вернуться назад</a>
         </div>
     </div>
+
+    <script>
+        // Счетчики символов
+        document.addEventListener('DOMContentLoaded', function() {
+            const textareas = [
+                {id: 'description', counter: 'description-counter', max: 2000},
+                {id: 'unique_journey', counter: 'journey-counter', max: 1000},
+                {id: 'employee_expectations', counter: 'expectations-counter', max: 1000},
+                {id: 'employee_contribution', counter: 'contribution-counter', max: 1000},
+                {id: 'team_description', counter: 'team-counter', max: 1000},
+                {id: 'interview_process', counter: 'interview-counter', max: 1000},
+                {id: 'benefits', counter: 'benefits-counter', max: 1000}
+            ];
+            
+            textareas.forEach(item => {
+                const textarea = document.getElementById(item.id);
+                const counter = document.getElementById(item.counter);
+                
+                if (textarea && counter) {
+                    textarea.addEventListener('input', function() {
+                        counter.textContent = this.value.length;
+                        
+                        if (this.value.length > item.max * 0.9) {
+                            counter.style.color = '#EF4444';
+                        } else {
+                            counter.style.color = 'var(--text-light)';
+                        }
+                    });
+                    
+                    // Инициализация счетчика
+                    counter.textContent = textarea.value.length;
+                }
+            });
+            
+            // Плавная прокрутка при ошибках
+            const firstError = document.querySelector('.alert');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    </script>
 </body>
 </html>

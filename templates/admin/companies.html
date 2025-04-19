@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% extends "_layout.html" %}
+    {% block content %}
+    <div class="container mt-5">
+      <h2>Компании</h2>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Название</th>
+            <th>Сайт</th>
+            <th>Контакты</th>
+            <th>Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for company in companies %}
+          <tr>
+            <td>{{ company.id }}</td>
+            <td>{{ company.name }}</td>
+            <td><a href="{{ company.website }}" target="_blank">{{ company.website }}</a></td>
+            <td>{{ company.contact_info }}</td>
+            <td>
+              <form method="post" action="{{ url_for('delete_company', company_id=company.id) }}" onsubmit="return confirm('Удалить компанию?')">
+                <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endblock %}
+    
+</body>
+</html>

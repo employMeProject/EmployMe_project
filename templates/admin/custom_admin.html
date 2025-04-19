@@ -1,0 +1,48 @@
+<!-- templates/admin/custom_admin.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Админ-панель</title>
+</head>
+<body>
+    {% extends "_layout.html" %}
+    <h1>Админка 👑</h1>
+    {% block content %}
+    <div class="container mt-5">
+    <h1>Админ-панель</h1>
+    <p>Добро пожаловать, {{ current_user.first_name }}!</p>
+
+    <div class="list-group mt-4">
+        <a href="{{ url_for('admin_users') }}" class="list-group-item list-group-item-action">
+        👥 Управление пользователями
+        </a>
+        <a href="{{ url_for('admin_companies') }}" class="list-group-item list-group-item-action">
+        🏢 Управление компаниями
+        </a>
+        <a href="{{ url_for('admin_jobs') }}" class="list-group-item list-group-item-action">
+        💼 Управление вакансиями
+        </a>
+    </div>
+    </div>
+    {% endblock %}
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th><th>Имя</th><th>Email</th><th>Логин</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.first_name }} {{ user.last_name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.username }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

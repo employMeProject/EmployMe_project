@@ -1,111 +1,232 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Загрузка резюме</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563EB;
+            --primary-dark: #1E40AF;
+            --primary-light: #3B82F6;
+            --gray-light: #F3F4F6;
+            --gray-border: #E5E7EB;
+            --gray-text: #6B7280;
+            --white: #FFFFFF;
+            --radius: 12px;
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --transition: all 0.2s ease;
+        }
+
+
+
+
+
+        form {
+            background: var(--white);
+            margin: 40px auto;
+            padding: 40px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 600px;
+            transition: var(--transition);
+        }
+
+        form:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        form h2 {
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary-dark);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"],
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--gray-border);
+            border-radius: var(--radius);
+            font-size: 15px;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 140px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 14px 16px;
+            border: 2px dashed var(--gray-border);
+            border-radius: var(--radius);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .file-input-label:hover {
+            border-color: var(--primary);
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+
+        .file-input-label i {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .file-input-label span {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .file-input-label small {
+            color: var(--gray-text);
+            font-size: 13px;
+        }
+
+        .file-input {
+            position: absolute;
+            width: 0.1px;
+            height: 0.1px;
+            opacity: 0;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 16px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .required-field::after {
+            content: " *";
+            color: #EF4444;
+        }
+
+        @media (max-width: 640px) {
+            form {
+                padding: 30px 20px;
+                margin: 20px auto;
+            }
+            
+            form h2 {
+                font-size: 20px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<style>
-
-
-  form {
-    background: white;
-    margin-top: 40px;
-    padding: 30px;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-    margin-top: 50px;
-  }
-
-  form h2 {
-    font-size: 24px;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 20px;
-  }
-
-  input[type="text"],
-  input[type="email"],
-  input[type="tel"],
-  input[type="file"],
-  textarea {
-    width: 100%;
-    padding: 12px;
-    margin-top: 8px;
-    margin-bottom: 20px;
-    border: 1px solid #d1d5db;
-    border-radius: 10px;
-    transition: border-color 0.2s ease-in-out;
-  }
-
-  input[type="file"]::file-selector-button {
-    background: #1e3a8a;
-    color: white;
-    border: none;
-    padding: 8px 14px;
-    margin-right: 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-  }
-
-  input:focus,
-  textarea:focus {
-    border-color: #2563eb;
-    outline: none;
-  }
-
-  textarea {
-    resize: vertical;
-    min-height: 120px;
-  }
-
-  button[type="submit"] {
-    width: 100%;
-    background-color: #1e3a8a;
-    color: white;
-    padding: 12px;
-    border: none;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
-  }
-
-  button[type="submit"]:hover {
-    background-color: #3b82f6;
-  }
-
-</style>
 <body>
-  {%include "_header.html"%}
-    <form method="POST" enctype="multipart/form-data" class="space-y-4 max-w-xl mx-auto p-6 bg-white rounded shadow">
-        <h2 class="text-2xl font-bold text-center">Upload Your Resume</h2>
-      
-        <input type="text" name="name" placeholder="First Name" required class="w-full p-2 border rounded">
-        <input type="text" name="last_name" placeholder="Last Name" required class="w-full p-2 border rounded">
-        <input type="email" name="email" placeholder="Email" required class="w-full p-2 border rounded">
-        <input type="tel" name="phone_number" placeholder="Phone Number" required class="w-full p-2 border rounded">
-      
-        <label class="block">
-          <span>Resume</span>
-          <input type="file" name="resume" accept=".pdf" required class="w-full p-2 border rounded">
-        </label>
-      
-        <label class="block">
-          <span>Portfolio</span>
-          <input type="file" name="portfolio" accept=".pdf" required class="w-full p-2 border rounded">
-        </label>
-      
-        <textarea name="cover_letter" placeholder="Cover Letter (optional)" class="w-full p-2 border rounded" rows="4"></textarea>
-      
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded w-full">Submit</button>
-      </form>
-      {%include "_footer.html"%}
+    <div class="container">
+        {%include "_header.html"%}
+        {% if current_user.is_authenticated %}
+        <form method="POST" enctype="multipart/form-data">
+            <h2><i class="fas fa-file-upload"></i> Загрузите ваше резюме</h2>
+            
+            <div class="form-group">
+                <label class="required-field">Имя</label>
+                <input type="text" name="name" placeholder="Введите ваше имя" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="required-field">Фамилия</label>
+                <input type="text" name="last_name" placeholder="Введите вашу фамилию" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="required-field">Email</label>
+                <input type="email" name="email" placeholder="example@mail.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="required-field">Телефон</label>
+                <input type="tel" name="phone_number" placeholder="+7 (999) 123-45-67" required>
+            </div>
+            
+            <div class="file-input-wrapper">
+                <label class="required-field">Резюме</label>
+                <label for="resume" class="file-input-label">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>Загрузите файл резюме</span>
+                    <small>Формат: PDF (максимальный размер: 5MB)</small>
+                </label>
+                <input type="file" id="resume" name="resume" class="file-input" accept=".pdf" required>
+            </div>
+            
+            <div class="file-input-wrapper">
+                <label>Портфолио</label>
+                <label for="portfolio" class="file-input-label">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Загрузите портфолио</span>
+                    <small>Формат: PDF (максимальный размер: 10MB)</small>
+                </label>
+                <input type="file" id="portfolio" name="portfolio" class="file-input" accept=".pdf">
+            </div>
+            
+            <div class="form-group">
+                <label>Сопроводительное письмо</label>
+                <textarea name="cover_letter" placeholder="Расскажите о себе и почему вы подходите на эту позицию..."></textarea>
+            </div>
+            
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-paper-plane"></i> Отправить заявку
+            </button>
+        </form>
+        {% endif %}
+    </div>
+    {%include "_footer.html"%}
 </body>
 </html>

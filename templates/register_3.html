@@ -12,36 +12,37 @@
     
     <div class="top-bar">
         <a href="{{ url_for('register_step_2') }}"><span class="back-arrow">&#8592;</span></a>
-        <div class="progress-bar">
+        <div class="progress-bar" style="width: 800px; margin: 0 auto;">
             <div class="progress-filled" style="width: 65%;"></div>
         </div>
-        <span class="save-exit">Save And Exit</span>
     </div>
 
     <div class="form-wrapper">
-        <h2>What Is Minimum Salary You Want?</h2>
-        <p class="subtitle">We use this to match you nearby offers that approximately<br> pay this amount or more</p>
+        <h2>Какую минимальную зарплату вы хотите?</h2>
+        <p class="subtitle">Мы используем это, чтобы сопоставить вам близлежащие предложения, которые приблизительно<br> платят эту сумму или больше</p>
 
         <form method="POST" class="form-grid">
             <div class="form-group">
-                <label for="min_salary">Minimum Salary Amount</label>
+                <label for="min_salary">Минимальная заработная плата</label>
                 <select id="min_salary" name="min_salary" required>
-                    <option value="" disabled selected>Select Amount</option>
+                    <option value="" disabled selected>Выбор</option>
                     <option value="10000">10,000</option>
                     <option value="20000">20,000</option>
                     <option value="30000">30,000</option>
+                    <option value="30000">50,000</option>
+                    <option value="30000">100,000</option>
+                    <option value="30000">200,000</option>
                     <!-- Добавь больше при необходимости -->
                 </select>
-                <p class="helper-text">Amount is by Soms</p>
+                <p class="helper-text">Сумма указана в сомах</p>
             </div>
 
             <div class="form-group">
-                <label for="payment_period">Payment Period</label>
+                <label for="payment_period">Платежный период</label>
                 <select id="payment_period" name="payment_period" required>
-                    <option value="" disabled selected>Select Period</option>
-                    <option value="hourly">Hourly</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
+                    <option value="" disabled selected>Выберите период</option>
+                    <option value="hourly">Почасовая оплата</option>
+
                 </select>
             </div>
 

@@ -6,9 +6,12 @@ conn = sqlite3.connect('mydatabase.db')
 cursor = conn.cursor()
 
 # Получаем информацию о колонках таблицы, например "users"
-cursor.execute("PRAGMA table_info(companies);")  # замени 'users' на свою таблицу
+# Показывает структуру таблицы 'companies'
+cursor.execute("PRAGMA table_info(applications)")
 columns = cursor.fetchall()
 
-# Выводим названия колонок
+print("Схема таблицы 'applications':")
 for col in columns:
-    print(col[1])  # col[1] — это имя колонки
+    print(col)
+
+conn.close()

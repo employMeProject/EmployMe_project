@@ -16,6 +16,7 @@
             padding: 0;
             color: #333;
             line-height: 1.6;
+            overflow-x: hidden;  /* Убирает горизонтальный скролл */
         }
         
         /* Стили для Swiper */
@@ -169,14 +170,17 @@
         }
         
         /* Секция "Why Choose" */
+        .overlay{
+            width: 100%;
+            margin-top: -60px;
+        }
         .why-choose {
             background-color: #f8f9fa;
-            padding: 60px 20px;
-            margin-top: 50px;
+
         }
         
         .why-row {
-            max-width: 1200px;
+            max-width: 1500px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
@@ -185,7 +189,7 @@
         
         .why-text h2 {
             text-align: center;
-            color: #2c3e50;
+            color: white;
             margin-bottom: 40px;
             font-size: 2rem;
         }
@@ -213,7 +217,7 @@
         
         .reason p {
             font-weight: 500;
-            color: #2c3e50;
+            color: #f8f9fa;
         }
         
         /* Партнеры */
@@ -322,6 +326,64 @@
             color: #7f8c8d;
             font-size: 1.2rem;
         }
+        .snap-slider {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 20px;
+            padding: 20px;
+            scroll-behavior: smooth;
+        }
+
+        .snap-slider::-webkit-scrollbar {
+            display: none; /* скрыть скролл на WebKit */
+        }
+
+        .snap-slide {
+            scroll-snap-align: start;
+            flex: 0 0 300px;
+            border-radius: 10px;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .snap-slide:hover {
+            transform: translateY(-5px);
+        }
+        .partners-section {
+            padding: 2rem 1rem;
+            background-color: #f8f9fa;
+            text-align: center;
+        }
+
+        .partners-section h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        .partners-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .partner-card img {
+            max-height: 60px;
+            max-width: 160px;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+            filter: grayscale(80%);
+        }
+
+        .partner-card img:hover {
+            transform: scale(1.05);
+            filter: grayscale(0%);
+        }
+
     </style>
 </head>
 <body>
@@ -331,14 +393,14 @@
     {% block title %}Home - EmployMe{% endblock %}
 
     {% block content %}
-    <h1 style="text-align: center; margin-top: 30px; font-size: 2.2rem; color: #2c3e50;">Start your job journey</h1>
+    <h1 style="text-align: center; margin-top: 30px; font-size: 2.2rem; color: #2c3e50;">Начни свое путешествие</h1>
     <form class="search-form" action="{{ url_for('search_jobs_route') }}" method="GET">
         <div class="search-row">
             <input 
                 type="text" 
                 class="search-input" 
                 name="query"  
-                placeholder="Job title, keywords"
+                placeholder="Название, Ключевые слова"
                 aria-label="Job search"
                 value="{{ request.args.get('query', '') }}"
             >
@@ -346,78 +408,70 @@
                 type="text" 
                 class="search-input" 
                 name="location" 
-                placeholder="City, country"
+                placeholder="Страна, Город"
                 aria-label="Location"
                 value="{{ request.args.get('location', '') }}"
             >
         </div>
         
-        <button type="submit" class="search-button">Search</button>
+        <button type="submit" class="search-button">Искать</button>
     </form>
     
-    <form method="GET" action="{{ url_for('search_jobs_route') }}" id="filterForm">
-      <div class="filter-tags">
-        {% for t in ['Полная занятость', 'Частичная занятость', 'Remote', 'Contract', 'Internship', 'Temporary', 'Freelance', 'Flexible', 'On-site', 'Hybrid'] %}
-          <button type="submit" name="job_type" value="{{ t }}" 
-                  class="filter-button {% if request.args.get('job_type') == t %}active{% endif %}">
-            {{ t }}
-          </button>
-        {% endfor %}
-      </div>
-    </form>    
+    <form method="GET" action="{{ url_for('search_jobs_route') }}">
+        <div class="filter-tags">
+      
+          {# Тип занятости (job_type) #}
+          {% for t in ['Утренняя смена', '6 часов в день', 'Ночная смена'] %}
+            <button type="submit" name="job_type" value="{{ t }}"
+                    class="filter-button {% if request.args.get('job_type') == t %}active{% endif %}">
+              {{ t }}
+            </button>
+          {% endfor %}
+      
+          {# Локации (location) #}
+          {% for loc in ['Бишкек', 'Ош', 'Каракол'] %}
+            <button type="submit" name="location" value="{{ loc }}"
+                    class="filter-button {% if request.args.get('location') == loc %}active{% endif %}">
+              {{ loc }}
+            </button>
+          {% endfor %}
+      
+          {# Названия профессий (query) #}
+          {% for title in ['Дизайнер', 'Официант','Python', 'Грузщик'] %}
+            <button type="submit" name="query" value="{{ title }}"
+                    class="filter-button {% if request.args.get('query') == title %}active{% endif %}">
+              {{ title }}
+            </button>
+          {% endfor %}
+      
+        </div>
+      </form>
+       
     <!-- Exclusive Offers Block: отображается, если нет поиска -->
       {% if not search_active %}
-      <section class="exclusive-offers" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
-          <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">Exclusive Offers</h2>
-          
-          <div class="job-cards-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
-              {% for job in jobs %}
-              <div class="job-card">
-                  <h3 class="job-title">{{ job.job_title }}</h3>
-                  <p class="job-price"><i class="bi bi-cash"></i> {{ job.salary_range }}</p>
-                  <p class="job-company"><i class="bi bi-building"></i> {{ job.company_name }}</p>
-                  <p class="job-location"><i class="bi bi-geo-alt"></i> {{ job.location }}</p>
-                  
-                  <div class="job-details">
-                      {% if job.early_apply %}
-                          <span class="early-apply" style="color: #28a745; font-size: 0.8rem;"><i class="bi bi-clock"></i> Early Apply</span>
-                      {% endif %}
-                      {% if job.multiple_candidates %}
-                          <span class="multiple-candidates" style="color: #17a2b8; font-size: 0.8rem;"><i class="bi bi-people"></i> Multiple Candidates</span>
-                      {% endif %}
-                  </div>
-                  <a href="{{ url_for('apply_for_job', job_id=job.id) }}" class="apply-button">Apply Now</a>
-              </div>
-              {% endfor %}
-          </div>
-      </section>
-      {% endif %}
 
+      {% endif %}
+      <div class="snap-slider">
+        {% for job in jobs %}
+          <div class="snap-slide job-card">
+            <h3>{{ job.job_title }}</h3>
+            <p><i class="bi bi-geo-alt"></i> {{ job.location }}</p>
+            <p><i class="bi bi-briefcase"></i> {{ job.job_type }}</p>
+            <p><i class="bi bi-building"></i> {{ job.company_name }}</p>
+            {% if 'salary_range' in job and job['salary_range'] %}
+                <p><i class="bi bi-cash"></i> {{ job['salary_range'] }}</p>
+            {% endif %}
+          
+            <a href="{{ url_for('apply_for_job', job_id=job.id) }}" class="apply-button">Поддатся</a>
+          </div>
+        {% endfor %}
+      </div>
+      
+      
       <!-- Search Results Block: отображается, если выполнен поиск -->
       {% if search_active %}
       {% if jobs|length > 0 %}
-      <div class="swiper">
-        <div class="swiper-wrapper">
-          {% for job in jobs %}
-            <div class="swiper-slide">
-              <div class="job-card">
-                <h3>{{ job.job_title }}</h3>
-                <p><i class="bi bi-geo-alt"></i> {{ job.location }}</p>
-                <p><i class="bi bi-briefcase"></i> {{ job.job_type }}</p>
-                {% if job.get('salary_range') %}
-                    <p><i class="bi bi-cash"></i> {{ job.salary_range }}</p>
-                {% endif %}
-                <p><i class="bi bi-building"></i> {{ job.company_name }}</p>
-                <a href="{{ url_for('apply_for_job', job_id=job.id) }}" class="apply-button">Apply Now</a>
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-        
-        <!-- Навигация -->
-        <div class="swiper-button-prev"></div>
-        <div class="swiper-button-next"></div>
-      </div>
+
       {% else %}
         <div class="no-results">
             <p>No jobs found matching your criteria.</p>
@@ -430,54 +484,45 @@
           <div class="content-box">
             <div class="why-row">
               <div class="why-text">
-                <h2>Why Choose EmployMe?</h2>
+                <h2>Почему стоит выбрать EmployMe?</h2>
               </div>
               <div class="reasons">
                 <div class="reason">
                     <img src="{{ url_for('static', filename='images/why1.png') }}" alt="Community">
-                  <p>EmployMe Community</p>
+                  <p>Сообщество EmployMe</p>
                 </div>
                 <div class="reason">
                     <img src="{{ url_for('static', filename='images/why2.png') }}" alt="Opportunities">
-                  <p>Find Job Opportunities</p>
+                  <p>Найти возможность трудоустройства</p>
                 </div>
                 <div class="reason">
                     <img src="{{ url_for('static', filename='images/why3.png') }}" alt="Clients">
-                  <p>Find Perfect Clients</p>
+                  <p>Найдите идеальных клиентов</p>
                 </div>
                 <div class="reason">
                     <img src="{{ url_for('static', filename='images/why4.png') }}" alt="Income">
-                  <p>Fast Income</p>
+                  <p>Быстрый доход</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
+      <h2 style="text-align: center; margin-top:50px">Наши Партнеры</h2>
+      <div class="snap-slider">
+        {% for partner in partners %}
+          <div class="snap-slide job-card">
+            <h3>{{ partner.name }}</h3>
+            {% if partner.website %}
+            <a href="{{ partner.website }}" target="_blank">
+              <i class="bi bi-globe2"></i> {{ partner.website }}
+            </a>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
       
-      <section class="partners-section">
-        <h2>Our Partners</h2>
-        <div class="partners-grid">
-          <div class="partner-card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
-          </div>
-          <div class="partner-card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft">
-          </div>
-          <div class="partner-card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/9/96/Apple_logo_black.svg" alt="Apple">
-          </div>
-          <div class="partner-card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon">
-          </div>
-          <div class="partner-card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/01/LinkedIn_Logo.svg" alt="LinkedIn">
-          </div>
-          <div class="partner-card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Laravel.svg" alt="Laravel">
-          </div>
-        </div>
-      </section>
+      
     {% include "_footer.html" %}
 
     {% endblock %}

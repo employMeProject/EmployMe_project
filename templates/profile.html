@@ -442,7 +442,7 @@
                     <p id="user-city">{{ current_user.city or "Город не указан" }}</p>
                     <span class="badge">Активный пользователь</span>
                 </div>
-                <button class="edit-btn" id="edit-profile-btn"><i class="fas fa-edit"></i> Редактировать</button>
+                <button class="edit-btn" id="edit-profile-btn" style="display: none;"><i class="fas fa-edit" style="display: none;"></i> </button>
             </div>
             
             <div class="profile-content">
@@ -494,30 +494,6 @@
                         </div>
                     </div>
                     
-                    <h2 class="section-title">
-                        Навыки
-                        <button class="edit-section-btn" data-section="skills">
-                            <i class="fas fa-edit"></i> Изменить
-                        </button>
-                    </h2>
-                    
-                    <div class="skills" id="skills-list">
-                        {% for skill in (current_user.skills or '').split(',') if skill %}
-                        <span class="skill">{{ skill }} <span class="skill-remove" onclick="removeSkill('{{ skill }}')">&times;</span></span>
-                        {% endfor %}
-                    </div>
-                    
-                    <div class="edit-form" id="skills-edit-form" style="display: none;">
-                        <div class="form-group">
-                            <label for="new-skill-input">Добавить навык</label>
-                            <div class="input-group">
-                                <input type="text" id="new-skill-input" class="form-control" placeholder="Новый навык">
-                                <button class="btn btn-primary" onclick="addSkill()">Добавить</button>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary" onclick="saveSkills()">Сохранить</button>
-                        <button class="btn btn-danger" onclick="cancelEdit('skills')">Отмена</button>
-                    </div>
                     
                     <h2 class="section-title">Резюме</h2>
                     
@@ -529,7 +505,7 @@
                             <small>Загружено: {{ resume.created_at.strftime('%d.%m.%Y') if resume.created_at else "Дата неизвестна" }}</small>
                         </div>
                         <div class="resume-actions">
-                            <a href="{{ url_for('static', filename='uploads/' + resume.resume_path) }}" download>
+                            <a href="{{ url_for('static', filename='uploads/resumes/' + resume.resume_path) }}" download>
                                 <i class="fas fa-download"></i> Скачать
                             </a>
                             <a href="#" onclick="deleteResume({{ resume.id }})">
@@ -675,6 +651,23 @@
                 </form>
             </div>
         </div>
+        <div class="applications-section" style = "margin: 0 auto; width: 60%;">
+            <h2 class="section-title">🎯 Рекомендованные вакансии</h2>
+        
+            {% if recommended_jobs %}
+                {% for job in recommended_jobs[:3] %}
+                <div class="application-card under_review">
+                    <h3>{{ job.job_title }}</h3>
+                    <p class="company">{{ job.company.name }}</p>
+                    <p class="date">{{ job.location }}</p>
+                    <a href="{{ url_for('job_details', job_id=job.id) }}" class="btn btn-primary btn-sm" style="margin-top: 0.5rem;">Посмотреть</a>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>Недостаточно информации для рекомендаций. Заполните профиль!</p>
+            {% endif %}
+        </div>
+        
 
         <script>
             // Обработчики для редактирования разделов

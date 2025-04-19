@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Как это работает</title>
+  <style>
+
+    .box {
+      background: #fff;
+      max-width: 800px;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+      animation: slideUp 0.6s ease;
+    }
+
+    h1 {
+      color: #2f80ed;
+      margin-bottom: 20px;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 12px;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(25px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Как это работает</h1>
+    <ul>
+      <li>Создайте профиль и загрузите своё резюме.</li>
+      <li>Изучайте вакансии и отправляйте заявки в один клик.</li>
+      <li>Работодатели получают уведомление и просматривают вашу кандидатуру.</li>
+      <li>Получайте приглашения на интервью или офферы прямо на платформе.</li>
+    </ul>
+  </div>
+</body>
+</html>

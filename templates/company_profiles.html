@@ -366,24 +366,41 @@
                 white-space: nowrap;
             }
         }
+        .carousel-column {
+            width: 300px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .carousel-column h2 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
     </style>
 </head>
 <body>
     {% include "_header.html"%}
     <div class="container">
         <div class="carousel-column">
-            <h2>Our Partner Companies</h2>
+            <h2>Компании</h2>
             <div class="vertical-carousel">
                 {% for company in all_companies %}
-                <div class="company-preview {% if selected_company and company.id == selected_company.id %}active{% endif %}" 
-                     data-company-id="{{ company.id }}">
-                    {% if company.photo %}
-                    <img src="{{ url_for('static', filename='uploads/' + company.photo) }}" alt="{{ company.name }}" class="logo-small">
-                    {% else %}
-                    <div class="logo-placeholder"><i class="fas fa-building"></i></div>
-                    {% endif %}
-                    <h3>{{ company.name }}</h3>
-                </div>
+                    <div class="company-preview {% if selected_company and company.id == selected_company.id %}active{% endif %}" data-company-id="{{ company.id }}">
+                        {% if company.photo %}
+                            <img src="{{ url_for('static', filename='uploads/' + company.photo) }}" class="logo-small" alt="{{ company.name }}">
+                        {% else %}
+                            <div class="logo-placeholder"><i class="fas fa-building"></i></div>
+                        {% endif %}
+                        <h3>{{ company.name }}</h3>
+                    </div>
                 {% endfor %}
             </div>
             <div class="carousel-controls">
@@ -411,29 +428,28 @@
                     <p><i class="fas fa-envelope"></i> {{ selected_company.contact_info }}</p>
                     {% endif %}
                     {% if selected_company.website %}
-                    <a href="{{ selected_company.website }}" class="visit"><i class="fas fa-external-link-alt"></i> Visit Website</a>
+                    <a href="{{ selected_company.website }}" class="visit" style="color: white;"><i class="fas fa-external-link-alt"></i> Visit Website</a>
                     {% endif %}
                 </div>
             </div>
 
             <div class="tabs">
-                <button class="tab-button active" onclick="openTab('about', this)">About</button>
-                <button class="tab-button" onclick="openTab('jobs', this)">Jobs</button>
-                <button class="tab-button" onclick="openTab('people', this)">People</button>
-                <button class="tab-button" onclick="openTab('life', this)">Life</button>
+                <button class="tab-button active" onclick="openTab('about', this)">О компании</button>
+                <button class="tab-button" onclick="openTab('jobs', this)">Работа</button>
+
             </div>
 
             <div id="about" class="tab-content active">
-                <h2>About the Company</h2>
+                <h2>О компании</h2>
                 {% if selected_company.about %}
                 <p>{{ selected_company.about }}</p>
                 {% else %}
-                <p>No information available about this company.</p>
+                <p>Информация об этой компании отсутствует.</p>
                 {% endif %}
             </div>
 
             <div id="jobs" class="tab-content">
-                <h2>Current Job Openings</h2>
+                <h2>Текущие вакансии</h2>
                 {% if jobs %}
                     {% for job in jobs %}
                     <div class="job-card">
@@ -443,9 +459,9 @@
                         <p>{{ job.describe_position|truncate(200) }}</p>
                         {% endif %}
                         {% if job.salary_range %}
-                        <p><i class="fas fa-money-bill-wave"></i> Salary: {{ job.salary_range }}</p>
+                        <p><i class="fas fa-money-bill-wave"></i> Зарплата: {{ job.salary_range }}</p>
                         {% endif %}
-                        <a href="/job/{{ job.id }}"><i class="fas fa-arrow-right"></i> View Details</a>
+                        <a href="{{ url_for('apply_for_job', job_id=job.id) }}" class="apply-button">Поддатся</a>
                     </div>
                     {% endfor %}
                 {% else %}
@@ -456,26 +472,13 @@
                 {% endif %}
             </div>
 
-            <div id="people" class="tab-content">
-                <div class="no-selection">
-                    <i class="fas fa-users"></i>
-                    <h2>People at {{ selected_company.name }}</h2>
-                    <p>Information about the team will be displayed here soon.</p>
-                </div>
-            </div>
 
-            <div id="life" class="tab-content">
-                <div class="no-selection">
-                    <i class="fas fa-smile"></i>
-                    <h2>Life at {{ selected_company.name }}</h2>
-                    <p>Photos and information about company culture coming soon.</p>
-                </div>
-            </div>
+
             {% else %}
             <div class="no-selection">
                 <i class="fas fa-hand-pointer"></i>
-                <h2>Select a Company</h2>
-                <p>Choose a company from the list to view its profile</p>
+                <h2>Выберите компанию</h2>
+                <p>Выберите компанию из списка, чтобы просмотреть ее профиль.</p>
             </div>
             {% endif %}
         </div>
@@ -532,6 +535,48 @@
             if (activeCompany) {
                 activeCompany.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
             }
+        });
+        const isHorizontal = window.innerWidth <= 992;
+
+        prevBtn.addEventListener('click', () => {
+            if (isHorizontal) {
+                carousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else {
+                carousel.scrollBy({ top: -scrollAmount, behavior: 'smooth' });
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (isHorizontal) {
+                carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            } else {
+                carousel.scrollBy({ top: scrollAmount, behavior: 'smooth' });
+            }
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            const carousel = document.querySelector('.vertical-carousel');
+            const prevBtn = document.querySelector('.prev-btn');
+            const nextBtn = document.querySelector('.next-btn');
+            const scrollAmount = 150;
+
+            const isHorizontal = () => window.innerWidth <= 992;
+
+            if (prevBtn && nextBtn && carousel) {
+                prevBtn.addEventListener('click', () => {
+                    carousel.scrollBy({ [isHorizontal() ? 'left' : 'top']: -scrollAmount, behavior: 'smooth' });
+                });
+                nextBtn.addEventListener('click', () => {
+                    carousel.scrollBy({ [isHorizontal() ? 'left' : 'top']: scrollAmount, behavior: 'smooth' });
+                });
+            }
+
+            const companyPreviews = document.querySelectorAll('.company-preview');
+            companyPreviews.forEach(preview => {
+                preview.addEventListener('click', () => {
+                    const companyId = preview.dataset.companyId;
+                    window.location.href = `/company/${companyId}`;
+                });
+            });
         });
     </script>
 </body>
