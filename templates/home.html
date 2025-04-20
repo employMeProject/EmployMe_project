@@ -429,7 +429,7 @@
           {% endfor %}
       
           {# Локации (location) #}
-          {% for loc in ['Бишкек', 'Ош', 'Каракол'] %}
+          {% for loc in ['Бишкек'] %}
             <button type="submit" name="location" value="{{ loc }}"
                     class="filter-button {% if request.args.get('location') == loc %}active{% endif %}">
               {{ loc }}
